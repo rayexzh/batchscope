@@ -11,9 +11,11 @@ import math
 from pathlib import Path
 import random
 import sqlite3
+from runtime_paths import RESOURCE_ROOT
+from workbench import build_operations, export_operations
 
-ROOT = Path(__file__).resolve().parent
-VERSION = "0.4.0-alpha.1"
+ROOT = RESOURCE_ROOT
+VERSION = "0.5.0-alpha.1"
 COLUMNS = {
     "batches": "batch_id product manufactured_on".split(),
     "test_results": "test_id batch_id test_type method value unit spec_low spec_high spec_unit measured_on".split(),
@@ -193,6 +195,7 @@ def analyse(inputs, output, as_of):
             rows = cursor.fetchall()
             details[query.stem] = [dict(zip(columns, row)) for row in rows]
             write_csv(output / f"{query.stem}_details.csv", columns, rows)
+        operations = build_operations(db, as_of)
         db.commit()
     tests = reports["01_test_ranges"]
     metrics = {
@@ -206,7 +209,8 @@ def analyse(inputs, output, as_of):
     summary = {"project": "BatchScope", "version": VERSION, "as_of": as_of, "data_type": "synthetic-demo-only",
                "input_rows": {t: len(rows) for t, rows in data.items()},
                "input_sha256": hashes, "metrics": metrics, "reports": reports,
-               "details": details}
+               "details": details, "operations": operations}
+    export_operations(output, summary)
     (output / "RESULTS.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False, allow_nan=False), encoding="utf-8")
     lines = ["# BatchScope / 批次质量洞察", "", "Pharmaceutical quality operations analytics / 药企质量运营分析", "", "Synthetic demonstration / 模拟数据演示",
              f"As of / 截至：{as_of}", "", "| Metric / 指标 | Value / 数值 |", "|---|---:|"]

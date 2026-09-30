@@ -1,0 +1,36 @@
+name: Windows EXE
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+jobs:
+  portable:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - name: Test calculations and interface
+        run: python -m unittest discover -v
+      - name: Install build-only dependencies
+        run: python -m pip install -r requirements-build.txt
+      - name: Build portable Windows application
+        run: python build_windows.py
+      - name: Smoke-test the packaged EXE
+        shell: pwsh
+        run: |
+          $process = Start-Process -FilePath .\dist\BatchScope.exe -ArgumentList @('--self-test', 'build\exe-smoke') -Wait -PassThru -WindowStyle Hidden
+          if ($process.ExitCode -ne 0) { throw 'Packaged EXE smoke test failed.' }
+          $result = Get-Content build\exe-smoke\SELF_TEST.json -Raw | ConvertFrom-Json
+          if ($result.status -ne 'passed') { throw 'Packaged EXE evidence is not passed.' }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BatchScope-windows-x64
+          path: |
+            dist/*.zip
+            dist/SHA256SUMS.txt
+            dist/BUILD.json
+            build/exe-smoke/SELF_TEST.json

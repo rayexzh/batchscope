@@ -1,8 +1,8 @@
 {
   "project": "BatchScope",
-  "version": "0.4.0-alpha.1",
-  "date": "2026-09-30",
-  "automated_tests": 33,
+  "version": "0.5.0-alpha.1",
+  "date": "2026-10-01",
+  "automated_tests": 43,
   "result": "passed",
   "demo_snapshots": {
     "2026-06-30": {
@@ -20,7 +20,13 @@
         "03_overdue_actions": 30
       },
       "reconciliation": "passed",
-      "artifact_hashes": "passed"
+      "artifact_hashes": "passed",
+      "operations_metrics": {
+        "outstanding_actions": 37,
+        "due_today": 1,
+        "due_soon": 1,
+        "closed_parent_followup": 11
+      }
     },
     "2026-07-31": {
       "metrics": {
@@ -75,5 +81,28 @@
     "comparison search and continuing-record filter preserve snapshot on view changes",
     "background comparison failure and recovery",
     "comparison page scrolling and short tabs at larger font sizes"
-  ]
+  ],
+  "operations_checks": [
+    "Due today, inclusive 1–7 day horizon and future-completion rules",
+    "Completed actions have no outstanding days-until-due value",
+    "Non-overlapping backlog ages and reconciliation",
+    "Monthly stock-flow equation, old carryover and partial months",
+    "Fixed batch snapshot with completed actions retained",
+    "Escaped offline report and output hashes",
+    "Persistent frozen-application output path"
+  ],
+  "packaged_exe_checks": {
+    "result": "passed",
+    "host": "Windows 11 x64",
+    "checks": [
+      "Embedded SQL and schema",
+      "Known synthetic June/July metrics",
+      "Native Generate/Analyse",
+      "Workbench and fixed batch trace",
+      "Language/theme switching",
+      "Artifact hashes and SQLite foreign keys"
+    ],
+    "conditions": "Standalone EXE in Chinese/spaced path outside source directory with PATH restricted to Windows directories. Isolated output profile. Host has Python installed; not a separate clean-machine test.",
+    "release_evidence": "EXE_VERIFICATION.json in release assets"
+  }
 }

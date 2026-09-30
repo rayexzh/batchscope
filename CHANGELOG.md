@@ -1,5 +1,13 @@
 # Change log / 更新日志
 
+## v0.5.0-alpha.1 — Quality follow-up and Windows EXE / 质量跟进与 EXE
+
+- Added a quality review workbench: outstanding action timing, closed-parent follow-up, open deviation age bands and reconciled monthly backlog movements. Time urgency is not quality-risk ranking. / 新增措施跟进、已关闭偏差关联措施提醒、积压分段与月度对账；时间紧迫度不是质量风险。
+- Added fixed-date batch overviews linking measurements, deviations and all visible actions, plus a bilingual offline HTML review report and three additional hashed CSVs. / 新增批次全景、双语离线复核报告与三个 CSV 导出。
+- Separated bundled read-only SQL resources from persistent EXE output in the user profile. Added an isolated PyInstaller build, portable ZIP, checksums, EXE self-test and Windows build workflow. / 内置 SQL 与用户输出分离，增加隔离打包、便携 ZIP、哈希、EXE 自检与构建工作流。
+- Moved review controls to a separate row and provided scrollable review/batch layouts for larger fonts. / 复核操作独立排列，工作台和批次窗口支持大字体滚动。
+- Validation: 43 source tests; packaged-EXE and release-download results are supplied with release evidence. / 源码 43 项测试，打包与下载后验证结果随版本提供。
+
 ## v0.4.0-alpha.1 — Two-date review / 两日期复核
 
 - Named the independent project **BatchScope / 批次质量洞察**, with consistent desktop, report and bilingual documentation names. Maintained separately from RxDataLint. / 统一独立项目名称、界面、报告与双语介绍，和 RxDataLint 分开维护。

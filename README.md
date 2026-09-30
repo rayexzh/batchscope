@@ -4,7 +4,7 @@
 
 [![Tests](https://github.com/rayexzh/batchscope/actions/workflows/tests.yml/badge.svg)](https://github.com/rayexzh/batchscope/actions/workflows/tests.yml)
 
-[中文说明](README.zh-CN.md) · **Local desktop prototype · v0.4.0-alpha.1 · synthetic data only**
+[中文说明](README.zh-CN.md) · **Local desktop prototype · v0.5.0-alpha.1 · synthetic data only**
 
 A small pharmaceutical quality-operations portfolio project that links batches, measurements, deviations and actions in SQLite. It answers three questions using an explicit **as-of date**:
 
@@ -20,7 +20,11 @@ This project demonstrates domain-aware data modelling, Python input validation, 
 
 ## Run the desktop program
 
-Requires Python 3.10+ with Tkinter, SQLite 3.25+ (normally bundled with official Python), and no third-party packages. Currently tested on Windows with Python 3.14.7. An EXE has not yet been packaged.
+**Without Python (Windows x64):** download the portable ZIP from [Releases](https://github.com/rayexzh/batchscope/releases), extract it completely, and double-click **BatchScope.exe**. No Python installation or paid API is needed. Generated data and results persist in `%LOCALAPPDATA%\BatchScope\outputs`, independently of the bundled resource/extraction directory. The executable is unsigned; SHA-256 checksums are provided with the release.
+
+**From source:**
+
+Requires Python 3.10+ with Tkinter, SQLite 3.25+ (normally bundled with official Python), and no third-party runtime packages. Source-mode outputs stay under the project `outputs/` directory.
 
 - Open this folder as a project in PyCharm, then run the root **app.py** file.
 - Alternatively, double-click **run_desktop.bat** if `python` is available on PATH.
@@ -41,6 +45,20 @@ Details use the completed run's date and data. Editing the date or input files d
 - Key findings appear before secondary columns. Metric cards reflow when the window is narrow; scroll the page to reach lower controls with larger fonts. Activity bars disappear after processing.
 
 See [interface guide and previews](docs/INTERFACE.md). Display settings do not change analysis or export contents.
+
+### Quality review workbench
+
+After analysing, click **Quality review workbench**. Three views help review outstanding actions and backlog:
+
+- **Action follow-up:** overdue, due today, due in the next 1–7 days, and later actions. The default filter shows overdue/near-due items. A separate filter identifies outstanding actions whose parent deviation is closed; this is a follow-up prompt, not an automatic compliance finding.
+- **Backlog age:** open deviations grouped by product/category into example 0–7, 8–30, 31–60 and 61+ day bands. Each group's bands reconcile with its open count.
+- **Monthly movements:** up to 12 months of opening backlog, openings, closures and ending backlog. Each period reconciles `opening + opened − closed = ending`; the last period ends at the as-of date, even mid-month.
+
+Select an action and open **Batch overview**, or choose a batch ID. This traces its measurements, deviations and **all** actions visible at the stored snapshot, including completed actions. Search and language/theme switching preserve the snapshot.
+
+**Open review report** opens a standalone bilingual `QUALITY_REVIEW.html` with the queue, age groups, monthly chart, reconciliation table and input fingerprints. The report is an offline export, not a hosted application; no external assets or model API are used. Three additional CSVs are hashed with the completed run. A comparison run places these end-date outputs in `end_snapshot/`.
+
+The [design rationale and rules](docs/QUALITY_REVIEW.md) explain the industry reference and the deliberately limited claims.
 
 ### Compare two dates
 
@@ -99,7 +117,7 @@ See [DATA_DICTIONARY.md](DATA_DICTIONARY.md), [schema.sql](schema.sql), [summary
 
 ## Validation and current limits
 
-33 automated tests passed locally, covering calculations, summary/detail reconciliation, two-date counts and record movements, same-day/empty comparisons, future completions, input blocking, output hashes, source changes after loading, search/filtering, UI language/theme changes, row identity, context menus, copying, fonts and background comparison failure/recovery. Local screenshots were inspected in light Chinese, dark English and large-font modes, including the comparison window.
+43 automated tests cover the existing calculations and interfaces plus work queues, the 7-day boundary, age-band boundaries, monthly stock/flow reconciliation, partial months, older carryover, batch tracing, HTML escaping and persistent packaged output paths. Release smoke-test evidence is provided separately; neither tests nor EXE packaging constitute regulated-system validation.
 
 This is a first local prototype. There is no external-user validation, automatic unit conversion, risk prediction, CAPA effectiveness assessment, access-control system or electronic signature. Historical views use dates in the supplied snapshot; they do not reconstruct edits, reopened deviations or backdated corrections. SQLite REAL numbers are approximate. Inputs are held in memory and the desktop table displays all summary rows, so large datasets are outside the current validated scope.
 
@@ -110,3 +128,5 @@ Fictional specifications and automated range flags **do not constitute OOS inves
 Have a domain reviewer inspect one scenario, document corrections, then add one justified workflow improvement. Practise explaining the three SQL queries and their denominators independently. Additional dashboards or AI features come after the metrics and user need are established.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) to report a reproducible problem or suggest a domain review.
+
+Build instructions and packaged-EXE checks are in [WINDOWS_BUILD.md](docs/WINDOWS_BUILD.md).

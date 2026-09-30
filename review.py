@@ -13,6 +13,9 @@ REPORT_LABELS = {
     "03_overdue_actions": "措施记录 / Actions",
 }
 STATUS_LABELS = {
+    "due_today": "今天到期 / Due today",
+    "due_soon": "1–7 天内到期 / Due in 1–7 days",
+    "later": "7 天以后到期 / Due later",
     "not_opened": "尚未开启 / Not opened",
     "not_created": "尚未创建 / Not created",
     "completed": "已完成 / Completed",
@@ -30,6 +33,15 @@ FILTERS = {
     "03_overdue_actions": ("overdue",),
 }
 FIELD_LABELS = {
+    "manufactured_on": "批次生产日期 / Manufactured",
+    "parent_status": "关联偏差状态 / Parent deviation status",
+    "days_until_due": "距到期天数（负值为逾期） / Days until due (negative = late)",
+    "closed_parent_followup": "已关闭偏差需跟进（1=是） / Closed parent follow-up (1=yes)",
+    "age_0_7": "积压 0–7 天 / Age 0–7 days", "age_8_30": "积压 8–30 天 / Age 8–30 days",
+    "age_31_60": "积压 31–60 天 / Age 31–60 days", "age_61_plus": "积压 61 天以上 / Age 61+ days",
+    "period": "月份 / Month", "period_end": "本期截止 / Period end",
+    "opening_open": "期初积压 / Opening backlog", "opened_in_period": "本期开启 / Opened in period",
+    "closed_in_period": "本期关闭 / Closed in period", "ending_open": "期末积压 / Ending backlog",
     "metric": "指标 / Metric", "before_value": "起始值 / Start value",
     "after_value": "截至值 / End value", "delta": "净变化 / Net change",
     "before_status": "起始状态 / Start status", "after_status": "截至状态 / End status",
@@ -84,7 +96,7 @@ def clipboard_row(columns, row, language=None):
 def display_value(field, value, language=None):
     if value is None:
         return "—"
-    if field in ("snapshot_status", "before_status", "after_status"):
+    if field in ("snapshot_status", "before_status", "after_status", "parent_status"):
         return local_label(STATUS_LABELS.get(value, value), language)
     if field in ("metric", "change"):
         from ui_text import TEXT, tr

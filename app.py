@@ -5,6 +5,7 @@ import os
 import queue
 import tempfile
 import threading
+import sys
 import tkinter as tk
 import tkinter.font as tkfont
 from tkinter import filedialog, messagebox, ttk
@@ -15,6 +16,8 @@ from review import (FILTERS, REPORT_LABELS, STATUS_LABELS, describe_group,
                     clipboard_row, display_value, field_label, filter_details, group_details, local_label)
 from ui_text import tr
 from ui_theme import apply_theme, enable_dpi_awareness
+from runtime_paths import output_root
+from workbench_ui import WorkbenchWindow
 
 ROOT = Path(__file__).resolve().parent
 PRIORITY = ["product", "test_type", "outside_range_records", "outside_range_pct", "missing_records",
@@ -27,6 +30,7 @@ class RecordTable:
     """Stable row IDs preserve record identity through sorting and language changes."""
     def __init__(self, parent, owner, detail_action=None):
         self.owner, self.detail_action = owner, detail_action
+        self.detail_label = "details"
         self.priority = PRIORITY
         self.rows, self.sort_state = [], None
         self.tree = ttk.Treeview(parent, show="headings", selectmode="browse", height=5)
@@ -99,7 +103,7 @@ class RecordTable:
                             font="TkMenuFont")
         self.menu.delete(0, "end")
         if self.detail_action:
-            self.menu.add_command(label=self.owner.t("details"), command=self.open_row)
+            self.menu.add_command(label=self.owner.t(self.detail_label), command=self.open_row)
             self.menu.add_separator()
         self.menu.add_command(label=self.owner.t("copy_row"), command=self.copy_row)
         self.menu.add_command(label=self.owner.t("copy_id"), command=self.copy_id)
@@ -311,6 +315,7 @@ class Window:
         self.phase, self.error, self.notice = "ready", "", None
         self.details = []
         self.comparisons = []
+        self.review_views = []
         self.colors = apply_theme(root, self.theme, self.font_size)
         root.geometry(f"1120x{min(1050, root.winfo_screenheight()-100)}")
         root.minsize(900, 600)
@@ -329,6 +334,12 @@ class Window:
         self.title.pack(anchor="w")
         toolbar = ttk.Frame(header)
         toolbar.pack(fill="x", pady=(5, 0))
+        review_toolbar = ttk.Frame(header)
+        review_toolbar.pack(fill="x", pady=(8, 0))
+        self.work_button = ttk.Button(review_toolbar, command=self.open_workbench, state="disabled")
+        self.work_button.pack(side="left")
+        self.report_button = ttk.Button(review_toolbar, command=self.open_review_report, state="disabled")
+        self.report_button.pack(side="left", padx=8)
         self.language_button = ttk.Button(toolbar, command=self.toggle_language)
         self.language_button.pack(side="right")
         self.theme_button = ttk.Button(toolbar, command=self.toggle_theme)
@@ -429,6 +440,8 @@ class Window:
                             (self.compare_to,"compare_to"), (self.view_compare_button,"view_comparison"),
                             (self.open_button,"results"), (self.detail_button,"details")):
             widget.configure(text=self.t(key))
+        self.work_button.configure(text=self.t("workbench"))
+        self.report_button.configure(text=self.t("open_review"))
         self.language_button.configure(text="English" if self.language == "zh" else "中文")
         self.theme_button.configure(text=self.t("dark" if self.theme == "light" else "light"))
         for key, (value, label) in self.metric_cards.items():
@@ -445,6 +458,9 @@ class Window:
         self.comparisons = [c for c in self.comparisons if c.window.winfo_exists()]
         for comparison in self.comparisons:
             comparison.apply_view()
+        self.review_views = [view for view in self.review_views if view.window.winfo_exists()]
+        for view in self.review_views:
+            view.apply_view()
 
     def toggle_language(self):
         self.language = "en" if self.language == "zh" else "zh"
@@ -503,8 +519,8 @@ class Window:
 
     def create_data(self):
         try:
-            parent = ROOT / "outputs"
-            parent.mkdir(exist_ok=True)
+            parent = output_root(ROOT)
+            parent.mkdir(parents=True, exist_ok=True)
             folder = Path(tempfile.mkdtemp(prefix="demo-", dir=parent)) / "inputs"
             generate(folder)
             self.inputs.set(str(folder))
@@ -522,8 +538,8 @@ class Window:
             messagebox.showerror(self.t("check_input"), self.t("select_input"))
             return
         try:
-            parent = ROOT / "outputs"
-            parent.mkdir(exist_ok=True)
+            parent = output_root(ROOT)
+            parent.mkdir(parents=True, exist_ok=True)
             output = Path(tempfile.mkdtemp(prefix="review-", dir=parent)) / "results"
         except OSError as exc:
             messagebox.showerror(self.t("failed"), str(exc))
@@ -532,7 +548,7 @@ class Window:
         self.busy, self.output, self.result = True, None, None
         self.phase, self.notice = "working", None
         self.metrics.set("")
-        for control in (self.run_button, self.generate_button, self.browse_button, self.date_entry, self.input_entry, self.open_button, self.detail_button, self.compare_button, self.from_entry, self.view_compare_button):
+        for control in (self.run_button, self.generate_button, self.browse_button, self.date_entry, self.input_entry, self.open_button, self.detail_button, self.compare_button, self.from_entry, self.view_compare_button, self.work_button, self.report_button):
             control.configure(state="disabled")
         self.apply_view()
         self.progress.pack(fill="x", pady=(0, 8), before=self.card_row)
@@ -567,6 +583,8 @@ class Window:
             self.output = output if output.exists() else None
             self.open_button.configure(state="normal" if self.output else "disabled")
             self.detail_button.configure(state="normal" if ok else "disabled")
+            self.work_button.configure(state="normal" if ok else "disabled")
+            self.report_button.configure(state="normal" if ok else "disabled")
             if ok:
                 self.result, self.phase = result, "completed"
                 self.metrics.set(str(result["metrics"]))
@@ -617,6 +635,22 @@ class Window:
         self.comparisons.append(view)
         return view
 
+    def open_workbench(self):
+        if self.busy or not self.result or "operations" not in self.result:
+            return None
+        view = WorkbenchWindow(self, self.result, RecordTable)
+        self.review_views.append(view)
+        return view
+
+    def open_review_report(self):
+        if self.busy or not self.result or not self.output:
+            return
+        folder = self.output / "end_snapshot" if "comparison" in self.result else self.output
+        try:
+            os.startfile(folder / "QUALITY_REVIEW.html")
+        except (OSError, AttributeError) as exc:
+            messagebox.showerror(self.t("open_review"), str(exc))
+
     def close(self):
         if self.busy:
             messagebox.showinfo(self.t("running"), self.t("wait_close"))
@@ -625,6 +659,9 @@ class Window:
 
 
 if __name__ == "__main__":
+    if len(sys.argv) == 3 and sys.argv[1] == "--self-test":
+        from exe_smoke import self_test
+        sys.exit(self_test(Path(sys.argv[2])))
     enable_dpi_awareness()
     root = tk.Tk()
     Window(root)

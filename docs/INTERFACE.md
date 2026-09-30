@@ -19,11 +19,19 @@ Row copying produces TSV with headers. Formula-like text is escaped and embedded
 
 ## Light Chinese / 浅色中文
 
-![Light Chinese desktop](screenshots/light-zh.png)
+![Light Chinese desktop](screenshots/main-zh.png)
 
 ## Dark English / 深色英文
 
-![Dark English desktop](screenshots/dark-en.png)
+![Dark English desktop](screenshots/main-en.png)
+
+## Quality follow-up / 质量跟进
+
+After analysis, **Quality review workbench** opens the outstanding-action queue, backlog age bands and monthly stock/flow tables. Select an action and open its batch, or choose a batch from the dropdown. **Open review report** opens a complete offline report independent of desktop filters. New views retain their original date/data when the main window changes.
+
+分析后打开 **质量复核工作台**，查看措施跟进、积压分段和月度变化；选中措施联查批次，或从下拉列表选择批次。**打开复核报告** 查看独立离线报告，不受界面筛选影响。旧窗口保持原分析日期与数据。
+
+See [review workflow and rules](QUALITY_REVIEW.md) / [复核口径](QUALITY_REVIEW.md).
 
 Screenshots show generated seed-42 data as of 2026-06-30. Native window capture inspected only this application's own window. Fonts use installed system families. DPI and layout results can vary across Windows versions, displays and scale factors.
 

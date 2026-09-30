@@ -4,7 +4,7 @@
 
 [![自动测试](https://github.com/rayexzh/batchscope/actions/workflows/tests.yml/badge.svg)](https://github.com/rayexzh/batchscope/actions/workflows/tests.yml)
 
-[English](README.md) · **本地桌面原型 · v0.4.0-alpha.1 · 仅模拟数据**
+[English](README.md) · **本地桌面原型 · v0.5.0-alpha.1 · 仅模拟数据**
 
 这个项目把你的“药品质量与安全 + 数据能力”连接起来：用 Python 检查输入，SQLite 建立四表关系，再通过 SQL 回答三个具体问题。
 
@@ -20,7 +20,11 @@
 
 ## 怎么打开
 
-需要 Python 3.10 或以上及 Tkinter；不需安装额外 Python 包。本次在 Windows、Python 3.14.7 上测试。尚未打包成 EXE。
+**不安装 Python（Windows 64 位）：**从 [Releases](https://github.com/rayexzh/batchscope/releases) 下载便携 ZIP，完整解压，双击 **BatchScope.exe**。无需 Python 或付费 API。生成的数据与结果保存到 `%LOCALAPPDATA%\BatchScope\outputs`，不写入程序的临时解压目录。本版本 EXE 未做数字签名，发布页提供 SHA-256 校验文件。
+
+**从源码运行：**
+
+需要 Python 3.10 或以上及 Tkinter；不需安装额外运行时包。源码方式的输出仍保存在项目 `outputs/` 下。
 
 1. 在 PyCharm 中打开这个项目文件夹。
 2. 打开根目录的 **app.py**，右键运行。
@@ -41,6 +45,20 @@
 - 进度条只在分析时显示。界面文字切换不会改变结果、输入或导出语言口径。
 
 界面示例和操作说明见 [INTERFACE.md](docs/INTERFACE.md)。
+
+### 质量复核工作台
+
+分析后点击 **质量复核工作台**，可以查看：
+
+- **措施跟进**：逾期、今天到期、1–7 天内到期与更晚到期的未完成措施。默认显示逾期及近期到期项；另可筛选“偏差已关闭，措施未完成”，这仅提示跟进，不自动判定违规。
+- **积压分布**：按产品与偏差类别，将未关闭偏差分为 0–7、8–30、31–60、61 天以上的示例分段；分段数量与组内未关闭数一致。
+- **月度变化**：最多 12 个月的期初积压、开启、关闭与期末积压，逐期核对“期初＋开启－关闭＝期末”；最后一期截至分析日期，可以是不完整月份。
+
+选中措施后打开 **批次全景**，或从列表选择批次编号，联查检验、偏差与该日期可见的**全部措施**，包括已完成项。语言、主题与搜索不会修改快照。
+
+**打开复核报告** 可以查看独立双语 `QUALITY_REVIEW.html`，包含工作列表、积压分段、月度图表、对账和输入文件指纹。这是离线导出报告，不是托管网页，不调用外部资源或模型 API。每次分析还会导出三个复核 CSV 并记录哈希；日期对比中的截至日期报告位于 `end_snapshot/`。
+
+行业参考与口径见 [质量复核设计说明](docs/QUALITY_REVIEW.md)。
 
 ### 两个日期的变化对比
 
@@ -98,7 +116,7 @@ python -m unittest discover -v
 
 输出包括 SQLite 数据库、三个 SQL 汇总 CSV、三个记录明细 CSV、JSON 指标、双语 Markdown 摘要及记录文件哈希的完成清单。哈希只能核对与清单是否一致，不是签名或 GMP 审计追踪。数据声明 `SOURCE.json` 必须标注 synthetic，但该声明不是独立的数据来源认证。
 
-本地 33 项测试已通过，包含两日期指标与记录变化对账、同日与空快照、未来完成日期、输入阻断、嵌套输出哈希、加载后源文件变化、搜索、语言与主题、排序定位、复制、字号及后台对比失败后的恢复。已检查本机浅色中文、深色英文、大字体和对比窗口截图。
+43 项测试覆盖原有计算与界面，以及措施状态、7 天边界、积压分段边界、月度存量对账、不完整月份、跨年积压、批次联查、HTML 转义与 EXE 持久输出路径。打包 EXE 的运行证据单独提供；测试或打包本身不代表受监管系统验证。
 
 ## 当前边界与后续方向
 
@@ -109,3 +127,5 @@ python -m unittest discover -v
 下一步先让老师或熟悉质量业务的人检查一个示例场景，记录反馈。你自己练习讲解 SQL 的 JOIN、CTE、窗口函数以及分母口径，再按反馈扩展一个有用功能。
 
 反馈与贡献方式见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
+打包与 EXE 验证步骤见 [WINDOWS_BUILD.md](docs/WINDOWS_BUILD.md)。
