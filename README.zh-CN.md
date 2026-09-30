@@ -18,6 +18,14 @@
 
 ![BatchScope 两日期对比](docs/screenshots/comparison-zh.png)
 
+## 英文演示与课堂试用材料
+
+[观看／下载约 2 分 50 秒英文演示](https://github.com/rayexzh/batchscope/releases/download/v0.5.0-alpha.2/BatchScope-English-Demo.mp4) · [下载完整演示与评审材料包](https://github.com/rayexzh/batchscope/releases/download/v0.5.0-alpha.2/BatchScope-Demo-and-Teacher-Review.zip)
+
+1080p 视频以实际软件状态画面剪辑，配英文字幕与本机合成旁白，不是作者本人英文录音。[制作说明与英文讲稿](docs/DEMO_VIDEO.md) 提供完整口径。
+
+[AI 模拟教师评审](docs/teacher-review/REPORT.zh-CN.md) 复现了 11 类任务、16 项核对，并记录具体界面问题；没有真实老师参与，也未测量学习效果。[课堂任务单与答案](docs/teacher-review/WORKSHEET.zh-CN.md) 可用于后续独立试用。这次材料记录 v0.5.0-alpha.2，不改变软件运行代码，评审中提出的问题尚待后续修复。
+
 ## 怎么打开
 
 **不安装 Python（Windows 64 位）：**从 [Releases](https://github.com/rayexzh/batchscope/releases) 下载便携 ZIP，完整解压，双击 **BatchScope.exe**。无需 Python 或付费 API。生成的数据与结果保存到 `%LOCALAPPDATA%\BatchScope\outputs`，不写入程序的临时解压目录。本版本 EXE 未做数字签名，发布页提供 SHA-256 校验文件。

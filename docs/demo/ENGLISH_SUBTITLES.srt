@@ -1,0 +1,130 @@
+1
+00:00:00,250 --> 00:00:06,826
+BatchScope is a desktop prototype for reviewing pharmaceutical quality
+operations. This walkthrough uses fictional data to connect summary
+
+2
+00:00:06,826 --> 00:00:09,018
+metrics with the records behind them.
+
+3
+00:00:10,250 --> 00:00:17,855
+The Windows release runs without installing Python. Here, Generate
+creates a reproducible dataset of one hundred batches, with linked
+
+4
+00:00:17,855 --> 00:00:21,857
+measurements, deviations and actions. All processing stays on the
+computer.
+
+5
+00:00:22,550 --> 00:00:29,386
+For June thirtieth, the snapshot contains one hundred and ninety-eight
+measurements. Fourteen are missing, leaving one hundred and
+
+6
+00:00:29,386 --> 00:00:34,322
+eighty-four judgeable results. Missing values remain missing; they are
+never converted to zero.
+
+7
+00:00:35,550 --> 00:00:42,431
+Open a measurement group and filter the underlying records. Values,
+methods, units and example bounds support review. Seventy-four
+
+8
+00:00:42,431 --> 00:00:48,547
+measurements fall outside fictional ranges; that count is not an
+industry benchmark or an investigation conclusion.
+
+9
+00:00:49,200 --> 00:00:56,820
+The quality review workbench separates overdue actions, actions due
+today, and actions due within seven days. Its default view focuses on
+
+10
+00:00:56,820 --> 00:01:02,262
+these items. Time urgency helps organize follow-up; it does not measure
+patient or product risk.
+
+11
+00:01:03,200 --> 00:01:10,592
+A separate filter identifies outstanding actions linked to closed
+deviations. Eleven appear in this snapshot. These require context and
+
+12
+00:01:10,592 --> 00:01:14,872
+follow-up; the software does not automatically label them as procedural
+violations.
+
+13
+00:01:15,550 --> 00:01:23,355
+Select an action to open its batch overview. The tabs connect
+measurements, deviations and all actions visible at the same date,
+including
+
+14
+00:01:23,355 --> 00:01:27,612
+completed actions. This makes record tracing possible without losing the
+snapshot context.
+
+15
+00:01:28,550 --> 00:01:35,851
+Backlog age groups show where open deviations accumulate by product and
+category. The example age bands are mutually exclusive. Their
+
+16
+00:01:35,851 --> 00:01:40,597
+counts reconcile with the twenty-two open deviations, without imposing a
+regulatory time limit.
+
+17
+00:01:41,250 --> 00:01:48,338
+Monthly movements separate opening backlog, new openings, closures and
+ending backlog. In June, twenty plus five minus three equals
+
+18
+00:01:48,338 --> 00:01:54,307
+twenty-two. The final period ends at the analysis date, so a partial
+month stays clearly bounded.
+
+19
+00:01:55,000 --> 00:02:02,151
+Now compare June thirtieth with July thirty-first using the same input
+snapshot. Open deviations decrease from twenty-two to seventeen,
+
+20
+00:02:02,151 --> 00:02:07,797
+while overdue actions rise from thirty to thirty-three. The comparison
+exposes changes behind these totals.
+
+21
+00:02:08,450 --> 00:02:16,266
+Four actions enter the ending overdue list, while one previously overdue
+action completes. The net increase is three. Searches and record
+
+22
+00:02:16,266 --> 00:02:21,477
+identifiers support follow-up, while the software avoids claiming that
+these movements establish root causes.
+
+23
+00:02:22,150 --> 00:02:30,021
+The offline bilingual report includes a chart, review tables and input
+fingerprints. CSV exports and SQLite support further analysis.
+
+24
+00:02:30,021 --> 00:02:35,407
+Hashes identify file contents; they are not electronic signatures or
+proof of compliance.
+
+25
+00:02:36,100 --> 00:02:43,540
+BatchScope demonstrates data modelling, SQL analysis and clear quality-
+review logic. It is an open-source portfolio prototype, not a
+
+26
+00:02:43,540 --> 00:02:49,327
+validated production system. The next step is independent feedback from
+teachers or quality professionals.
+

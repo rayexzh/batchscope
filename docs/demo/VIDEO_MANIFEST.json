@@ -1,0 +1,132 @@
+{
+  "project": "BatchScope",
+  "app_version": "0.5.0-alpha.2",
+  "duration_seconds": 169.74999999999997,
+  "dimensions": [
+    1920,
+    1080
+  ],
+  "fps": 20,
+  "video_codec": "H.264",
+  "audio_codec": "AAC",
+  "voice": "Microsoft Zira Desktop, synthetic en-US, rate +2",
+  "method": "Edited guided walkthrough based on real native desktop captures and an offline report capture. Not uninterrupted screen recording, not maintainer voice, not external teacher validation.",
+  "captions": "Burned English subtitles plus separate SRT; estimated chunk timing follows narration duration.",
+  "chapters": [
+    {
+      "chapter": "Quality operations, made reviewable",
+      "start": 0,
+      "end": 10.0
+    },
+    {
+      "chapter": "01 / Start with reproducible data",
+      "start": 10.0,
+      "end": 22.3
+    },
+    {
+      "chapter": "02 / Interpret the snapshot",
+      "start": 22.3,
+      "end": 35.3
+    },
+    {
+      "chapter": "03 / Inspect the evidence",
+      "start": 35.3,
+      "end": 48.95
+    },
+    {
+      "chapter": "04 / Turn the summary into follow-up",
+      "start": 48.95,
+      "end": 62.95
+    },
+    {
+      "chapter": "05 / Check linked records",
+      "start": 62.95,
+      "end": 75.3
+    },
+    {
+      "chapter": "06 / Trace one batch",
+      "start": 75.3,
+      "end": 88.3
+    },
+    {
+      "chapter": "07 / Understand the backlog",
+      "start": 88.3,
+      "end": 101.0
+    },
+    {
+      "chapter": "08 / Reconcile monthly movements",
+      "start": 101.0,
+      "end": 114.75
+    },
+    {
+      "chapter": "09 / Compare the same input at two dates",
+      "start": 114.75,
+      "end": 128.2
+    },
+    {
+      "chapter": "10 / Explain the net change",
+      "start": 128.2,
+      "end": 141.9
+    },
+    {
+      "chapter": "11 / Export a reproducible review",
+      "start": 141.9,
+      "end": 155.85
+    },
+    {
+      "chapter": "From domain knowledge to an explainable workflow",
+      "start": 155.85,
+      "end": 169.75
+    }
+  ],
+  "files": {
+    "BatchScope-English-Demo.mp4": {
+      "bytes": 5151619,
+      "sha256": "743f76c81632283e46eb7384d6925de5e0cf0d3e42c433a01307352a760fda1f"
+    },
+    "BatchScope-English-Narration.wav": {
+      "bytes": 7486020,
+      "sha256": "1407a77131648c9c58bcedc4b1fbe8e3dc40e6bd2bdfa1e180f6efeb6d9b49d7"
+    },
+    "BatchScope-English-Script.md": {
+      "bytes": 4000,
+      "sha256": "b01bce693962955cbe3acaf12231260817b259af8e01d7a47e3b7588b6a5054a"
+    },
+    "BatchScope-English-Subtitles.srt": {
+      "bytes": 3968,
+      "sha256": "a4283847c1c22fad2772e15af3edbc0e986a9c16942d350e07d2319608b917f0"
+    },
+    "QUALITY_CHECK.json": {
+      "bytes": 640,
+      "sha256": "d8edf23d7e0168aecaba219e4bdd5a3422b2f93cb592c0dbe963849ff1ad1c64"
+    },
+    "START_HERE.txt": {
+      "bytes": 1186,
+      "sha256": "de3613af68c29d7d605cc5f2dbfefa02251133e416d71050c77780dd218b86a5"
+    },
+    "Teacher-Classroom-Worksheet.zh-CN.md": {
+      "bytes": 2793,
+      "sha256": "46cb9298e1a4cd3e20cd7097a2bc9895b91fec61ad497419cdc5c4d1761b4dbc"
+    },
+    "Teacher-Trial-Evidence.json": {
+      "bytes": 6892,
+      "sha256": "b2d18d480972e16cb7bb0f71ad55fc784161cb55039c83c7f7fade81e000c835"
+    },
+    "Teacher-Trial-Report.zh-CN.md": {
+      "bytes": 9062,
+      "sha256": "9dbdad4db701f8373112eaa8cb4d3584c030afefd6ec52494a00b2ed4cae6295"
+    },
+    "screenshots/comparison.png": {
+      "bytes": 33229,
+      "sha256": "4655fafeacade87150a088f38ffb7399fb3e78c44b1a742f1c9c4ff08846388b"
+    },
+    "screenshots/monthly.png": {
+      "bytes": 36241,
+      "sha256": "dd0f540d307d9f8769fc6d65c71ae4b5cea04358a922fa2337d384e40f0a3e72"
+    },
+    "screenshots/summary.png": {
+      "bytes": 47463,
+      "sha256": "cfca20798c3b33bfb5cfb8bb2633b195020fb361f298d06a385dd2129b16e3fd"
+    }
+  }
+}

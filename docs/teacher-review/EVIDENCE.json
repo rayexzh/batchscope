@@ -1,0 +1,251 @@
+{
+  "project": "BatchScope",
+  "version": "0.5.0-alpha.2",
+  "date": "2026-10-01",
+  "method": "AI-simulated teacher review with programmatic native-Tk interaction and captured real application states; no external teacher participated. Not an independent human usability test.",
+  "checks": [
+    {
+      "task": "T01",
+      "status": "passed",
+      "observation": "Review controls are disabled before a completed analysis",
+      "evidence": {
+        "workbench_state": "disabled"
+      }
+    },
+    {
+      "task": "T01",
+      "status": "passed",
+      "observation": "Starting without input shows an instruction and does not start analysis",
+      "evidence": {
+        "validation_dialogs": 1
+      }
+    },
+    {
+      "task": "T02",
+      "status": "passed",
+      "observation": "Generate creates four CSVs and a synthetic-source declaration",
+      "evidence": {
+        "files": [
+          "SOURCE.json",
+          "actions.csv",
+          "batches.csv",
+          "deviations.csv",
+          "test_results.csv"
+        ]
+      }
+    },
+    {
+      "task": "T03",
+      "status": "passed",
+      "observation": "June snapshot distinguishes measurements, judgeable and missing",
+      "evidence": {
+        "measured_records": 198,
+        "judgeable_records": 184,
+        "missing_records": 14,
+        "outside_range_records": 74,
+        "open_deviations": 22,
+        "overdue_actions": 30
+      }
+    },
+    {
+      "task": "T04",
+      "status": "passed",
+      "observation": "Measurement filter exposes matching records without changing the full group",
+      "evidence": {
+        "full_group": 49,
+        "outside_filtered": 14,
+        "group": {
+          "product": "Demo-Injectable",
+          "test_type": "assay",
+          "method": "demo-HPLC",
+          "unit": "%",
+          "spec_low": 95.0,
+          "spec_high": 105.0,
+          "measured_records": 49,
+          "judgeable_records": 46,
+          "missing_records": 3,
+          "outside_range_records": 14,
+          "outside_range_pct": 30.43
+        }
+      }
+    },
+    {
+      "task": "T05",
+      "status": "passed",
+      "observation": "Default workbench contains overdue, today and 1–7-day actions",
+      "evidence": {
+        "default_visible": 32,
+        "all_outstanding": 37
+      }
+    },
+    {
+      "task": "T05",
+      "status": "passed",
+      "observation": "Closed-parent filter reveals 11 outstanding actions and retains their actual states",
+      "evidence": {
+        "closed_parent_followup": 11
+      }
+    },
+    {
+      "task": "T06",
+      "status": "passed",
+      "observation": "Batch overview links every displayed record to the selected batch",
+      "evidence": {
+        "batch": "B0012",
+        "record_counts": {
+          "measurements": 2,
+          "deviations": 1,
+          "actions": 2
+        }
+      }
+    },
+    {
+      "task": "T07",
+      "status": "passed",
+      "observation": "Age-band totals reconcile to 22 open deviations",
+      "evidence": {
+        "open_total": 22
+      }
+    },
+    {
+      "task": "T07",
+      "status": "passed",
+      "observation": "June stock-flow reconciles 20 + 5 - 3 = 22",
+      "evidence": {
+        "period": "2026-06",
+        "period_end": "2026-06-30",
+        "opening_open": 20,
+        "opened_in_period": 5,
+        "closed_in_period": 3,
+        "ending_open": 22
+      }
+    },
+    {
+      "task": "T08",
+      "status": "passed",
+      "observation": "The two-date comparison reports both decreasing backlog and increasing overdue actions",
+      "evidence": {
+        "end_metrics": {
+          "measured_records": 200,
+          "judgeable_records": 186,
+          "missing_records": 14,
+          "outside_range_records": 75,
+          "open_deviations": 17,
+          "overdue_actions": 33
+        },
+        "metric_deltas": [
+          {
+            "metric": "measured_records",
+            "before_value": 198,
+            "after_value": 200,
+            "delta": 2
+          },
+          {
+            "metric": "judgeable_records",
+            "before_value": 184,
+            "after_value": 186,
+            "delta": 2
+          },
+          {
+            "metric": "missing_records",
+            "before_value": 14,
+            "after_value": 14,
+            "delta": 0
+          },
+          {
+            "metric": "outside_range_records",
+            "before_value": 74,
+            "after_value": 75,
+            "delta": 1
+          },
+          {
+            "metric": "open_deviations",
+            "before_value": 22,
+            "after_value": 17,
+            "delta": -5
+          },
+          {
+            "metric": "overdue_actions",
+            "before_value": 30,
+            "after_value": 33,
+            "delta": 3
+          }
+        ]
+      }
+    },
+    {
+      "task": "T08",
+      "status": "passed",
+      "observation": "Overdue net change is supported by 4 newly overdue and 1 resolved",
+      "evidence": {
+        "newly_overdue": 4,
+        "still_overdue": 29,
+        "resolved_overdue": 1
+      }
+    },
+    {
+      "task": "T09",
+      "status": "passed",
+      "observation": "Language/theme changes retain fixed batch and comparison dates",
+      "evidence": {
+        "batch_as_of": "2026-06-30",
+        "comparison": [
+          "2026-06-30",
+          "2026-07-31"
+        ]
+      }
+    },
+    {
+      "task": "T10",
+      "status": "passed",
+      "observation": "Invalid calendar date stops analysis and disables review controls",
+      "evidence": {
+        "phase": "failed",
+        "diagnostic": "day 30 must be in range 1..28 for month 2 in year 2026"
+      }
+    },
+    {
+      "task": "T10",
+      "status": "passed",
+      "observation": "The interface recovers after a corrected date",
+      "evidence": {
+        "phase": "completed"
+      }
+    },
+    {
+      "task": "T11",
+      "status": "passed",
+      "observation": "Completed outputs retain offline report, CSVs, SQLite and matching hashes",
+      "evidence": {
+        "hashed_artifacts": 13
+      }
+    }
+  ],
+  "june_metrics": {
+    "measured_records": 198,
+    "judgeable_records": 184,
+    "missing_records": 14,
+    "outside_range_records": 74,
+    "open_deviations": 22,
+    "overdue_actions": 30
+  },
+  "june_operations": {
+    "outstanding_actions": 37,
+    "due_today": 1,
+    "due_soon": 1,
+    "closed_parent_followup": 11
+  },
+  "june_monthly": {
+    "period": "2026-06",
+    "period_end": "2026-06-30",
+    "opening_open": 20,
+    "opened_in_period": 5,
+    "closed_in_period": 3,
+    "ending_open": 22
+  },
+  "overdue_movements": {
+    "newly_overdue": 4,
+    "still_overdue": 29,
+    "resolved_overdue": 1
+  }
+}

@@ -18,6 +18,14 @@ This project demonstrates domain-aware data modelling, Python input validation, 
 
 ![BatchScope two-date comparison](docs/screenshots/comparison-zh.png)
 
+## English demo and classroom review
+
+[Watch/download the 2:50 English demo](https://github.com/rayexzh/batchscope/releases/download/v0.5.0-alpha.2/BatchScope-English-Demo.mp4) · [Download the complete demo and review pack](https://github.com/rayexzh/batchscope/releases/download/v0.5.0-alpha.2/BatchScope-Demo-and-Teacher-Review.zip)
+
+The 1080p video presents real application states with English subtitles and locally synthesized narration. It is an edited walkthrough, not the maintainer's own spoken recording. See the [production disclosure and English script](docs/DEMO_VIDEO.md).
+
+The [AI-simulated teacher review](docs/teacher-review/REPORT.zh-CN.md) reproduces 16 checks across 11 task categories and documents usability findings. No external teacher participated and no learning outcomes were measured. A [classroom worksheet with answers](docs/teacher-review/WORKSHEET.zh-CN.md) is included for future independent trials. These materials document v0.5.0-alpha.2; they do not change the application or resolve the reported usability findings.
+
 ## Run the desktop program
 
 **Without Python (Windows x64):** download the portable ZIP from [Releases](https://github.com/rayexzh/batchscope/releases), extract it completely, and double-click **BatchScope.exe**. No Python installation or paid API is needed. Generated data and results persist in `%LOCALAPPDATA%\BatchScope\outputs`, independently of the bundled resource/extraction directory. The executable is unsigned; SHA-256 checksums are provided with the release.
