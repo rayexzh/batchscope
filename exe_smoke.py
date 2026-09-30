@@ -10,7 +10,7 @@ import time
 
 
 def self_test(folder):
-    folder = Path(folder)
+    folder = Path(folder).resolve()
     folder.mkdir(parents=True, exist_ok=True)
     root = None
     previous_local = os.environ.get("LOCALAPPDATA")

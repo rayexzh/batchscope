@@ -23,10 +23,12 @@ jobs:
         shell: pwsh
         run: |
           $process = Start-Process -FilePath .\dist\BatchScope.exe -ArgumentList @('--self-test', 'build\exe-smoke') -Wait -PassThru -WindowStyle Hidden
+          if (Test-Path build\exe-smoke\SELF_TEST.json) { Get-Content build\exe-smoke\SELF_TEST.json }
           if ($process.ExitCode -ne 0) { throw 'Packaged EXE smoke test failed.' }
           $result = Get-Content build\exe-smoke\SELF_TEST.json -Raw | ConvertFrom-Json
           if ($result.status -ne 'passed') { throw 'Packaged EXE evidence is not passed.' }
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: BatchScope-windows-x64
           path: |

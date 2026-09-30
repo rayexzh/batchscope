@@ -1,5 +1,10 @@
 # Change log / 更新日志
 
+## v0.5.0-alpha.2 — Portable self-test path fix / 便携版自检路径修复
+
+- Resolved relative self-test folders before constructing an isolated user-output profile. The first tagged EXE CI run exposed a false path-reconciliation failure when using the documented relative command. / 将自检目录先解析为绝对路径；首次标签构建发现相对路径命令造成输出位置核对误报，已复现并修复。
+- Print packaged-test diagnostics and retain build artifacts even if a CI step fails. Keep alpha.1 and its tag as release history. / 云端自检失败时打印诊断并保留构建产物，保留 alpha.1 及标签历史。
+
 ## v0.5.0-alpha.1 — Quality follow-up and Windows EXE / 质量跟进与 EXE
 
 - Added a quality review workbench: outstanding action timing, closed-parent follow-up, open deviation age bands and reconciled monthly backlog movements. Time urgency is not quality-risk ranking. / 新增措施跟进、已关闭偏差关联措施提醒、积压分段与月度对账；时间紧迫度不是质量风险。

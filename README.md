@@ -4,7 +4,7 @@
 
 [![Tests](https://github.com/rayexzh/batchscope/actions/workflows/tests.yml/badge.svg)](https://github.com/rayexzh/batchscope/actions/workflows/tests.yml)
 
-[中文说明](README.zh-CN.md) · **Local desktop prototype · v0.5.0-alpha.1 · synthetic data only**
+[中文说明](README.zh-CN.md) · **Local desktop prototype · v0.5.0-alpha.2 · synthetic data only**
 
 A small pharmaceutical quality-operations portfolio project that links batches, measurements, deviations and actions in SQLite. It answers three questions using an explicit **as-of date**:
 

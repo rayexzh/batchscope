@@ -1,6 +1,6 @@
 {
   "project": "BatchScope",
-  "version": "0.5.0-alpha.1",
+  "version": "0.5.0-alpha.2",
   "date": "2026-10-01",
   "automated_tests": 43,
   "result": "passed",
@@ -102,7 +102,7 @@
       "Language/theme switching",
       "Artifact hashes and SQLite foreign keys"
     ],
-    "conditions": "Standalone EXE in Chinese/spaced path outside source directory with PATH restricted to Windows directories. Isolated output profile. Host has Python installed; not a separate clean-machine test.",
+    "conditions": "Standalone EXE in Chinese/spaced path outside source directory with PATH restricted to Windows directories. Isolated output profile. Host has Python installed; not a separate clean-machine test. Relative and absolute self-test paths are checked for the patch release.",
     "release_evidence": "EXE_VERIFICATION.json in release assets"
   }
 }

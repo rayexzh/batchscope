@@ -4,7 +4,7 @@
 
 [![自动测试](https://github.com/rayexzh/batchscope/actions/workflows/tests.yml/badge.svg)](https://github.com/rayexzh/batchscope/actions/workflows/tests.yml)
 
-[English](README.md) · **本地桌面原型 · v0.5.0-alpha.1 · 仅模拟数据**
+[English](README.md) · **本地桌面原型 · v0.5.0-alpha.2 · 仅模拟数据**
 
 这个项目把你的“药品质量与安全 + 数据能力”连接起来：用 Python 检查输入，SQLite 建立四表关系，再通过 SQL 回答三个具体问题。
 
