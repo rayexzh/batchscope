@@ -1,0 +1,79 @@
+{
+  "project": "BatchScope",
+  "version": "0.4.0-alpha.1",
+  "date": "2026-09-30",
+  "automated_tests": 33,
+  "result": "passed",
+  "demo_snapshots": {
+    "2026-06-30": {
+      "metrics": {
+        "measured_records": 198,
+        "judgeable_records": 184,
+        "missing_records": 14,
+        "outside_range_records": 74,
+        "open_deviations": 22,
+        "overdue_actions": 30
+      },
+      "detail_rows": {
+        "01_test_ranges": 198,
+        "02_deviation_backlog": 33,
+        "03_overdue_actions": 30
+      },
+      "reconciliation": "passed",
+      "artifact_hashes": "passed"
+    },
+    "2026-07-31": {
+      "metrics": {
+        "measured_records": 200,
+        "judgeable_records": 186,
+        "missing_records": 14,
+        "outside_range_records": 75,
+        "open_deviations": 17,
+        "overdue_actions": 33
+      },
+      "detail_rows": {
+        "01_test_ranges": 200,
+        "02_deviation_backlog": 33,
+        "03_overdue_actions": 33
+      },
+      "reconciliation": "passed",
+      "artifact_hashes": "passed"
+    }
+  },
+  "comparison": {
+    "from_date": "2026-06-30",
+    "to_date": "2026-07-31",
+    "metric_deltas": {
+      "measured_records": 2,
+      "judgeable_records": 2,
+      "missing_records": 0,
+      "outside_range_records": 1,
+      "open_deviations": -5,
+      "overdue_actions": 3
+    },
+    "movements": {
+      "closed_since_start": 5,
+      "still_open": 17,
+      "newly_overdue": 4,
+      "resolved_overdue": 1,
+      "still_overdue": 29,
+      "new_measurement": 2
+    },
+    "reconciliation": "passed",
+    "nested_artifact_hashes": "passed",
+    "same_input_snapshot": true
+  },
+  "scope": "Local Windows Python 3.14.7; synthetic data. Automated Tk interactions and native-window screenshots on this machine only, including date comparisons and large-font page scrolling. No external-user, other-machine or multi-monitor validation.",
+  "interface_checks": [
+    "language/theme switch retains filters and selected records",
+    "numeric sort and NULL-last ordering",
+    "context menu targets clicked row",
+    "clipboard and formula-like text",
+    "font controls and closed-window refresh",
+    "view switching during background analysis",
+    "Windows native-window visual inspection: light Chinese, dark English, large text and record details",
+    "comparison search and continuing-record filter preserve snapshot on view changes",
+    "background comparison failure and recovery",
+    "comparison page scrolling and short tabs at larger font sizes"
+  ]
+}

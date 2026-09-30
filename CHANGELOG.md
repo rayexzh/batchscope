@@ -1,0 +1,32 @@
+# Change log / 更新日志
+
+## v0.4.0-alpha.1 — Two-date review / 两日期复核
+
+- Named the independent project **BatchScope / 批次质量洞察**, with consistent desktop, report and bilingual documentation names. Maintained separately from RxDataLint. / 统一独立项目名称、界面、报告与双语介绍，和 RxDataLint 分开维护。
+
+- Added a two-date comparison using one validated SQLite input snapshot, with six metric deltas and record-level deviation, overdue-action and new-measurement movements. / 使用同一份已校验输入快照，新增六个指标净变化与三类记录变化。
+- Added a separate desktop comparison view with search, continuing-record visibility, sorting, copying and synchronized language/theme. Dates and data stay fixed after later main-window edits. Scrollable layout supports larger fonts. / 新增独立对比窗口，支持搜索、持续记录显示、排序、复制、语言主题同步及大字体滚动；旧窗口保持快照。
+- Added four comparison CSV exports, start/end snapshots, a bilingual summary and a parent manifest covering nested artifacts. Added a worked synthetic business case. / 增加四个对比 CSV、两端快照、双语摘要、嵌套文件哈希清单与模拟业务案例。
+- Explicitly distinguish net stock changes from interval activity; opened-and-closed deviations are separate, and completed overdue episodes absent at both endpoints are not counted as endpoint movements. / 明确存量变化与期间活动的区别，避免误解新增逾期口径。
+- Validation: 33 local tests passed, including movements, dates, source stability, hashes and background failure/recovery. Local comparison screenshots checked in Chinese/English and large-font mode. / 本地 33 项测试通过，已检查双语与大字体对比截图。
+
+## v0.3.0-alpha.1 — Desktop presentation / 桌面界面
+
+- Added Chinese/English UI switching, light/dark palettes, adjustable native fonts and Windows DPI-awareness setup. Open detail windows keep snapshot data and filters while changing presentation. / 新增语言与主题切换、字体大小调整和 Windows DPI 适配，明细保留快照与筛选。
+- Added row context menus, clipboard copying with headers, identifier copying and numeric/text sorting with NULL values last. Stable row IDs preserve the clicked/selected record. / 新增右键菜单、复制与排序，保持记录定位正确。
+- Moved range flags and rates ahead of secondary columns, added six metric cards, alternating rows, responsive wrapping and page scrolling. Activity bars hide when processing ends. / 关键指标前移，增加指标卡片、隔行底色、自动换行与页面滚动，完成后隐藏进度条。
+- Validation: 24 local tests passed. Local native-window screenshots were inspected in Chinese/English, light/dark and large-font modes. No external-user, other-machine or multi-monitor validation. / 本地 24 项测试通过，已检查界面截图，尚未进行外部用户、其他电脑或多显示器验证。
+
+## v0.2.0-alpha.1 — Record review / 记录复核
+
+- Added measurement, deviation and overdue-action detail queries and three hashed detail CSV exports. Detail rows retain batch IDs and relevant dates. / 新增三类记录明细查询与 CSV 导出，保留批次编号和相关日期。
+- Summary rows open record windows by double-click or the Details button. Chinese/English headings, status filtering, record search and visible/full-group counts support review. / 双击汇总或点击明细按钮即可复核，支持双语字段、状态筛选、搜索与数量对照。
+- Detail views use the completed snapshot rather than changed input files or an edited date field. Future source closure/completion dates remain distinct from the as-of status. / 明细固定使用已完成的快照，源关闭/完成日期与截至日期状态分开呈现。
+- Cancelled scheduled GUI polling when the main window is destroyed. / 关闭主窗口时取消待执行的界面轮询。
+- Validation: 17 local automated tests passed, including summary/detail reconciliation at two dates and desktop interaction. No external or clean-machine validation. / 本地 17 项测试通过，含两个日期的明细对账与桌面交互；未进行外部或干净机器验证。
+
+## v0.1.0-alpha.1 — Initial local prototype / 首版本地原型
+
+- Added reproducible synthetic data, a four-table SQLite model, input checks and three analyses with an explicit as-of date. / 提供可复现模拟数据、四表 SQLite 模型、输入检查和三个指定日期分析。
+- Added a local desktop launcher, bilingual summaries, data dictionary and business brief. / 提供桌面入口、双语摘要、数据字典和业务解释。
+- Validation: 12 local tests passed. / 本地 12 项测试通过。

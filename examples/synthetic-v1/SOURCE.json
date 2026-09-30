@@ -1,0 +1,8 @@
+{
+  "data_type": "synthetic",
+  "generator_version": "0.1.0-alpha.1",
+  "seed": 42,
+  "batches": 100,
+  "date_origin": "2026-01-01",
+  "note": "Fictional products, methods and specifications; no real patient, employee or company records."
+}
