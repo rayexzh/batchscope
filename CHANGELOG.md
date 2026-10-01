@@ -1,5 +1,12 @@
 # Change log / 更新日志
 
+## v0.5.0-alpha.4 (2026-10-01) — Snapshot input clarity / 快照输入与窄窗口
+
+- Wrap date actions when the window cannot fit their full labels. / 日期操作在空间不足时换行。
+- Keep completed snapshots and show their input folder; changed inputs/dates display a pending-analysis notice. / 旧快照注明输入，新输入或日期提示尚未分析。
+- 47 local source tests passed; packaged diagnostics include changed-input and date-layout regressions. / 本地 47 项测试通过，EXE 自检同步覆盖。
+- Based on AI-scripted native desktop review, not real teacher feedback or external adoption. / 来自模拟界面试用，不声称真实教师认可。
+
 ## v0.5.0-alpha.3 (2026-10-01) — Clear review recovery / 复核恢复与导航
 
 - Validate calendar and date order before clearing results or reserving output. Bad dates keep the last completed snapshot. / 无效日期提前校验，保留原成功快照。

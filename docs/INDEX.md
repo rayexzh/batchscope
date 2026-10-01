@@ -8,6 +8,7 @@
 | Understand records / 理解数据 | [Data dictionary](../DATA_DICTIONARY.md) · [Review rules](QUALITY_REVIEW.md) |
 | Compare dates / 对比日期 | [Comparison guide](COMPARISON.md) |
 | Teacher exercise / 教学试用 | [Worksheet](teacher-review/WORKSHEET.zh-CN.md) · [AI-simulated review](teacher-review/REPORT.zh-CN.md) |
+| Simulated review / 模拟试用 | [Observed findings and fixes](SIMULATED-USABILITY-REVIEW.md) |
 | Changes / 版本变化 | [Changelog](../CHANGELOG.md) |
 | Other independent project / 另一个项目 | [RxDataLint](https://github.com/rayexzh/rx-data-lint) |
 

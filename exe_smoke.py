@@ -58,6 +58,14 @@ def self_test(folder):
             raise AssertionError("Generate/Analyse desktop workflow failed.")
         if not window.output.is_relative_to(output_root()):
             raise AssertionError("Desktop output escaped the persistent output root.")
+        original_inputs = window.inputs.get()
+        original_result = window.result
+        window.inputs.set(str(folder / "not-yet-analysed"))
+        if "尚未重新分析" not in window.status.get() or window.result is not original_result:
+            raise AssertionError("Changed inputs must label and retain the previous snapshot.")
+        window.inputs.set(original_inputs)
+        if "尚未重新分析" in window.status.get():
+            raise AssertionError("Restored inputs should clear the pending-input notice.")
         window.result, window.output, window.phase = result, folder / "analysis", "completed"
         window.apply_view()
         view = window.open_workbench()
@@ -72,6 +80,14 @@ def self_test(folder):
         fixed_id = batch.result["batch"]["batch_id"]
         window.toggle_language()
         window.toggle_theme()
+        root.deiconify()
+        root.geometry("900x600")
+        window.adjust_font(3)
+        for _ in range(4): root.update()
+        for button in (window.run_button,window.open_button,window.compare_button,window.view_compare_button):
+            if not button.winfo_ismapped() or button.winfo_width() < button.winfo_reqwidth():
+                raise AssertionError("A date control label is clipped.")
+        root.withdraw()
         if batch.result["batch"]["batch_id"] != fixed_id:
             raise AssertionError("Batch changed during presentation switch.")
         window.result = later
@@ -82,7 +98,8 @@ def self_test(folder):
                     "checks":["bundled SQL resources","June and July metrics","two-date comparison",
                               "work queue and backlog reconciliation","SQLite foreign keys","artifact hashes",
                               "native Generate/Analyse workflow and persistent outputs",
-                              "native workbench and batch tracing","language/theme switching","comparison window"],
+                              "native workbench and batch tracing","language/theme switching","comparison window",
+                              "changed-input snapshot context", "small-window date controls"],
                     "metrics": result["metrics"], "operations_metrics":operations["metrics"],
                     "persistent_output_root":str(output_root())}
         (folder / "SELF_TEST.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2), encoding="utf-8")

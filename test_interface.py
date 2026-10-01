@@ -36,6 +36,34 @@ class InterfaceTests(unittest.TestCase):
         self.root = None
         gc.collect()
 
+    def test_changed_inputs_and_dates_label_previous_snapshot(self):
+        app=self.app
+        folder=str((self.folder/"inputs").resolve())
+        app.inputs.set(folder)
+        app.result_inputs=(folder,"2026-06-30",None)
+        app.render_status()
+        original=app.result
+        app.inputs.set(str(self.folder/"different-inputs"))
+        self.assertIn("尚未重新分析",app.status.get())
+        self.assertIn(folder,app.status.get())
+        self.assertIs(app.result,original)
+        app.inputs.set(folder)
+        self.assertNotIn("尚未重新分析",app.status.get())
+        app.as_of.set("2026-07-31")
+        app.toggle_language()
+        self.assertIn("not analysed yet",app.status.get())
+        self.assertIn("2026-06-30",app.status.get())
+
+    def test_date_buttons_keep_full_labels_at_small_size_large_font(self):
+        app=self.app
+        self.root.deiconify();self.root.geometry("900x600")
+        app.toggle_language();app.adjust_font(3)
+        for _ in range(4):self.root.update()
+        for button in (app.run_button,app.open_button,app.compare_button,app.view_compare_button):
+            self.assertTrue(button.winfo_ismapped())
+            self.assertGreaterEqual(button.winfo_width(),button.winfo_reqwidth())
+            self.assertLessEqual(button.winfo_x()+button.winfo_width(),button.master.winfo_width())
+
     def test_language_and_theme_preserve_data_filter_and_selection(self):
         app = self.app
         table = app.record_tables["01_test_ranges"]

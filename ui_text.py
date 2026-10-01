@@ -1,5 +1,7 @@
 """Single-language desktop text; source data remains unchanged."""
 TEXT = {
+    "inputs_changed": ("输入或日期已变更，尚未重新分析；下方仍为上次快照。", "Inputs or dates changed; not analysed yet. The previous snapshot remains below."),
+    "snapshot_input": ("快照对应输入：{folder}", "Snapshot input: {folder}"),
     "date_help": ("请输入有效的 YYYY-MM-DD 日期，起始日期不能晚于截至日期。上次成功结果已保留，请按快照日期阅读。", "Enter valid YYYY-MM-DD dates; the start cannot be after the end. The last successful result is retained at its snapshot date."),
     "date_order": ("起始日期晚于截至日期。", "Start date is after the end date."),
     "queue_filter": ("仅筛选措施跟进", "Action follow-up filter only"),

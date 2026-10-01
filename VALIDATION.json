@@ -1,8 +1,8 @@
 {
   "project": "BatchScope",
-  "version": "0.5.0-alpha.3",
+  "version": "0.5.0-alpha.4",
   "date": "2026-10-01",
-  "automated_tests": 45,
+  "automated_tests": 47,
   "result": "passed",
   "demo_snapshots": {
     "2026-06-30": {
@@ -100,14 +100,18 @@
       "Native Generate/Analyse",
       "Workbench and fixed batch trace",
       "Language/theme switching",
-      "Artifact hashes and SQLite foreign keys"
+      "Artifact hashes and SQLite foreign keys",
+      "changed-input snapshot context",
+      "small-window date controls"
     ],
     "conditions": "Standalone EXE extracted into a separate temporary Chinese/spaced path, with Python variables removed and a system-only PATH. Relative and absolute self-test paths checked on the build host; not a separate clean machine.",
     "release_evidence": "EXE_VERIFICATION.json in release assets",
-    "version": "0.5.0-alpha.3"
+    "version": "0.5.0-alpha.4"
   },
   "presentation_regressions": [
     "invalid dates retain the last completed snapshot",
-    "action filters are hidden on full-snapshot age/month tabs"
+    "action filters are hidden on full-snapshot age/month tabs",
+    "changed inputs and dates label the previous snapshot without changing its metrics",
+    "date controls retain complete labels at 900x600 and font size 14"
   ]
 }

@@ -311,6 +311,7 @@ class Window:
     def __init__(self, root):
         self.root, self.events = root, queue.Queue()
         self.busy, self.output, self.result = False, None, None
+        self.result_inputs = self.running_inputs = None
         self.language, self.theme, self.font_size = "zh", "light", 11
         self.phase, self.error, self.notice = "ready", "", None
         self.details = []
@@ -357,7 +358,7 @@ class Window:
         self.inputs = tk.StringVar()
         self.input_entry = ttk.Entry(frame, textvariable=self.inputs)
         self.input_entry.pack(fill="x")
-        row = ttk.Frame(frame)
+        self.date_row = row = ttk.Frame(frame)
         row.pack(fill="x", pady=12)
         self.date_label = ttk.Label(row)
         self.date_label.pack(side="left", padx=(0, 9))
@@ -368,7 +369,7 @@ class Window:
         self.run_button.pack(side="left", padx=10)
         self.open_button = ttk.Button(row, command=self.open_folder, state="disabled")
         self.open_button.pack(side="right")
-        row = ttk.Frame(frame)
+        self.comparison_row = row = ttk.Frame(frame)
         row.pack(fill="x", pady=(0, 10))
         self.from_label = ttk.Label(row)
         self.from_label.pack(side="left", padx=(0, 9))
@@ -420,6 +421,8 @@ class Window:
         self.scope = ttk.Label(frame, wraplength=1060, style="Muted.TLabel")
         self.scope.pack(side="bottom", anchor="w", pady=(12, 0), before=self.book)
         frame.bind("<Configure>", self.resize_text)
+        for variable in (self.inputs, self.as_of, self.from_date):
+            variable.trace_add("write", lambda *args: self.render_status())
         self.apply_view()
         self.poll_id = root.after(100, self.poll)
         root.bind("<Destroy>", self.on_destroy, add="+")
@@ -452,6 +455,7 @@ class Window:
             rows = self.result["reports"][key] if self.result else []
             table.populate(rows, preserve=True)
         self.render_status()
+        self.layout_date_controls()
         self.details = [d for d in self.details if d.window.winfo_exists()]
         for detail in self.details:
             detail.apply_view()
@@ -470,7 +474,26 @@ class Window:
         width = max(400, event.width-44)
         for label in (self.title, self.subtitle, self.status_label, self.scope):
             label.configure(wraplength=width)
+        self.layout_date_controls()
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def layout_date_controls(self):
+        for frame, label, entry, run, result in (
+            (self.date_row, self.date_label, self.date_entry, self.run_button, self.open_button),
+            (self.comparison_row, self.from_label, self.from_entry, self.compare_button, self.view_compare_button),
+        ):
+            widgets = (label, entry, run, result)
+            for widget in widgets:
+                if widget.winfo_manager() == "pack":
+                    widget.pack_forget()
+            required = sum(widget.winfo_reqwidth() for widget in widgets) + 40
+            wide = frame.winfo_width() >= required
+            for column in range(4):
+                frame.columnconfigure(column, weight=1 if wide and column == 2 else 0)
+            label.grid(row=0, column=0, sticky="w", padx=(0,8), pady=(0,6))
+            entry.grid(row=0, column=1, sticky="w", padx=(0,8), pady=(0,6))
+            run.grid(row=0 if wide else 1, column=2 if wide else 0, sticky="w", padx=(0,8), pady=(0,6))
+            result.grid(row=0 if wide else 1, column=3 if wide else 1, sticky="w", pady=(0,6))
 
     def scroll_page(self, event):
         # Tables/comboboxes keep their own wheel behaviour; the surrounding page scrolls.
@@ -510,6 +533,13 @@ class Window:
             text = self.t(self.phase)
         if self.notice:
             text += " · " + self.t(self.notice)
+        if self.phase == "completed" and self.result_inputs:
+            folder, as_of, start = self.result_inputs
+            text += "\n" + self.t("snapshot_input", folder=folder)
+            current = (str(Path(self.inputs.get().strip()).resolve()), self.as_of.get().strip(),
+                       self.from_date.get().strip() if start is not None else None)
+            if current != self.result_inputs:
+                text = self.t("inputs_changed") + "\n" + text
         self.status.set(text)
 
     def choose(self):
@@ -554,6 +584,7 @@ class Window:
             return
         from_date = self.from_date.get().strip()
         self.busy, self.output, self.result = True, None, None
+        self.running_inputs = (str(folder.resolve()), as_of, from_date if comparison else None)
         self.phase, self.notice = "working", None
         self.metrics.set("")
         for control in (self.run_button, self.generate_button, self.browse_button, self.date_entry, self.input_entry, self.open_button, self.detail_button, self.compare_button, self.from_entry, self.view_compare_button, self.work_button, self.report_button):
@@ -595,6 +626,7 @@ class Window:
             self.report_button.configure(state="normal" if ok else "disabled")
             if ok:
                 self.result, self.phase = result, "completed"
+                self.result_inputs = self.running_inputs
                 self.metrics.set(str(result["metrics"]))
             else:
                 self.error, self.phase = result, "failed"
