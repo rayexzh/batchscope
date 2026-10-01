@@ -1,5 +1,9 @@
 """Single-language desktop text; source data remains unchanged."""
 TEXT = {
+    "date_help": ("请输入有效的 YYYY-MM-DD 日期，起始日期不能晚于截至日期。上次成功结果已保留，请按快照日期阅读。", "Enter valid YYYY-MM-DD dates; the start cannot be after the end. The last successful result is retained at its snapshot date."),
+    "date_order": ("起始日期晚于截至日期。", "Start date is after the end date."),
+    "queue_filter": ("仅筛选措施跟进", "Action follow-up filter only"),
+    "filter_inactive": ("此页显示完整快照；措施筛选仅适用于措施跟进。", "This tab uses the full snapshot; the action filter applies only to Action follow-up."),
     "workbench": ("质量复核工作台", "Quality review workbench"),
     "open_review": ("打开复核报告", "Open review report"),
     "review_queue": ("措施跟进", "Action follow-up"),

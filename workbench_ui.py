@@ -86,6 +86,8 @@ class WorkbenchWindow(ReviewWindow):
         self.build(owner, factory, ("queue", "aging", "monthly"), "workbench")
         row = ttk.Frame(self.frame)
         row.pack(fill="x", pady=8, before=self.controls)
+        self.filter_label = ttk.Label(row)
+        self.filter_label.pack(side="left", padx=(0, 10))
         self.filter = ttk.Combobox(row, state="readonly", width=36)
         self.filter.pack(side="left")
         self.filter.bind("<<ComboboxSelected>>", lambda event: self.refresh())
@@ -105,6 +107,7 @@ class WorkbenchWindow(ReviewWindow):
         index = max(0, self.filter.current())
         self.filter.configure(values=[self.owner.t(k) for k in self.CODES])
         self.filter.current(index)
+        self.filter_label.configure(text=self.owner.t("queue_filter"))
         self.batch_button.configure(text=self.owner.t("batch360"))
         metrics = self.rows["metrics"]
         self.caption.configure(text=self.owner.t("snapshot", date=self.result["as_of"]) + "\n" + " · ".join(f"{self.owner.t(k)}: {v}" for k,v in metrics.items()) + "\n" + self.owner.t("review_hint"))
@@ -121,7 +124,14 @@ class WorkbenchWindow(ReviewWindow):
                          or (code == "review_focus" and r["snapshot_status"] in ("overdue", "due_today", "due_soon"))
                          or (code == "review_closed_parent" and r["closed_parent_followup"])
                          or r["snapshot_status"] == code]
-        self.filter.configure(state="readonly" if self.book.index("current") == 0 else "disabled")
+        active = self.book.index("current") == 0
+        if active:
+            if not self.filter.winfo_manager():
+                self.filter.pack(side="left")
+            self.filter_label.configure(text=self.owner.t("queue_filter"))
+        else:
+            self.filter.pack_forget()
+            self.filter_label.configure(text=self.owner.t("filter_inactive"))
         self.show_rows(rows, preserve)
 
     def choose_batch(self, event=None):

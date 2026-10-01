@@ -1,5 +1,12 @@
 # Change log / 更新日志
 
+## v0.5.0-alpha.3 (2026-10-01) — Clear review recovery / 复核恢复与导航
+
+- Validate calendar and date order before clearing results or reserving output. Bad dates keep the last completed snapshot. / 无效日期提前校验，保留原成功快照。
+- Hide the action filter on full-snapshot age/month tabs; preserve its choice when returning. / 措施筛选只在措施跟进显示。
+- Add standalone quick-start and navigation; historical alpha.2 demo and simulated teacher review remain labelled. / 独立启动导航并标注旧演示版本。
+- Validation: 45 local source tests passed; packaged EXE evidence is supplied with the release. / 本地 45 项测试通过，EXE 证据见附件。
+
 ## v0.5.0-alpha.2 — Portable self-test path fix / 便携版自检路径修复
 
 - Resolved relative self-test folders before constructing an isolated user-output profile. The first tagged EXE CI run exposed a false path-reconciliation failure when using the documented relative command. / 将自检目录先解析为绝对路径；首次标签构建发现相对路径命令造成输出位置核对误报，已复现并修复。

@@ -193,14 +193,15 @@ class InterfaceTests(unittest.TestCase):
                 self.root.update()
                 time.sleep(.01)
             self.assertFalse(app.busy)
-        with patch("app.ROOT", self.folder):
+        with patch("app.ROOT", self.folder), patch("app.messagebox.showerror") as error:
+            original_result, original_output = app.result, app.output
             app.start(comparison=True)
-            self.assertEqual(str(app.compare_button["state"]), "disabled")
-            self.assertEqual(str(app.from_entry["state"]), "disabled")
-            wait()
-            self.assertEqual(app.phase, "failed")
-            self.assertIsNone(app.result)
-            self.assertEqual(str(app.view_compare_button["state"]), "disabled")
+            error.assert_called_once()
+            self.assertFalse(app.busy)
+            self.assertEqual(app.phase, "completed")
+            self.assertIs(app.result, original_result)
+            self.assertEqual(app.output, original_output)
+            self.assertIs(app.result, self.result)
             app.from_date.set("2026-06-30")
             app.as_of.set("2026-07-31")
             app.start(comparison=True)
@@ -211,6 +212,34 @@ class InterfaceTests(unittest.TestCase):
             self.assertEqual(str(app.view_compare_button["state"]), "normal")
             self.assertEqual(len(app.comparisons), 1)
             self.assertTrue((app.output / "COMPARISON.md").is_file())
+
+    def test_invalid_calendar_date_preserves_result_without_new_output(self):
+        app = self.app
+        app.inputs.set(str(self.folder / "inputs"))
+        app.as_of.set("2026-02-30")
+        before = set(self.folder.iterdir())
+        with patch("app.ROOT", self.folder), patch("app.messagebox.showerror") as error:
+            app.start()
+        error.assert_called_once()
+        self.assertFalse(app.busy)
+        self.assertIs(app.result, self.result)
+        self.assertEqual(app.output, self.folder / "results")
+        self.assertEqual(set(self.folder.iterdir()), before)
+        self.assertIn("2026-06-30", app.status.get())
+
+    def test_action_filter_is_hidden_on_whole_snapshot_tabs(self):
+        view = self.app.open_workbench()
+        view.filter.current(6)
+        view.refresh()
+        chosen = view.filter.get()
+        view.book.select(1)
+        view.refresh()
+        self.assertEqual(view.filter.winfo_manager(), "")
+        self.assertEqual(view.visible_rows["aging"], self.app.result["operations"]["aging"])
+        view.book.select(0)
+        view.refresh()
+        self.assertEqual(view.filter.winfo_manager(), "pack")
+        self.assertEqual(view.filter.get(), chosen)
 
     def test_workbench_filters_and_batch_trace_survive_presentation_changes(self):
         app = self.app

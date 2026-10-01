@@ -4,7 +4,7 @@
 
 [![自动测试](https://github.com/rayexzh/batchscope/actions/workflows/tests.yml/badge.svg)](https://github.com/rayexzh/batchscope/actions/workflows/tests.yml)
 
-[English](README.md) · **本地桌面原型 · v0.5.0-alpha.2 · 仅模拟数据**
+[English](README.md) · **本地桌面原型 · v0.5.0-alpha.3 · 仅模拟数据**
 
 这个项目把你的“药品质量与安全 + 数据能力”连接起来：用 Python 检查输入，SQLite 建立四表关系，再通过 SQL 回答三个具体问题。
 
@@ -25,6 +25,8 @@
 1080p 视频以实际软件状态画面剪辑，配英文字幕与本机合成旁白，不是作者本人英文录音。[制作说明与英文讲稿](docs/DEMO_VIDEO.md) 提供完整口径。
 
 [AI 模拟教师评审](docs/teacher-review/REPORT.zh-CN.md) 复现了 11 类任务、16 项核对，并记录具体界面问题；没有真实老师参与，也未测量学习效果。[课堂任务单与答案](docs/teacher-review/WORKSHEET.zh-CN.md) 可用于后续独立试用。这次材料记录 v0.5.0-alpha.2，不改变软件运行代码，评审中提出的问题尚待后续修复。
+
+[Windows 下载](https://github.com/rayexzh/batchscope/releases/tag/v0.5.0-alpha.3) · [第一个示例](docs/QUICKSTART.md) · [文档导航](docs/INDEX.md)
 
 ## 怎么打开
 

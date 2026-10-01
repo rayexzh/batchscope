@@ -1,8 +1,8 @@
 {
   "project": "BatchScope",
-  "version": "0.5.0-alpha.2",
+  "version": "0.5.0-alpha.3",
   "date": "2026-10-01",
-  "automated_tests": 43,
+  "automated_tests": 45,
   "result": "passed",
   "demo_snapshots": {
     "2026-06-30": {
@@ -102,7 +102,12 @@
       "Language/theme switching",
       "Artifact hashes and SQLite foreign keys"
     ],
-    "conditions": "Standalone EXE in Chinese/spaced path outside source directory with PATH restricted to Windows directories. Isolated output profile. Host has Python installed; not a separate clean-machine test. Relative and absolute self-test paths are checked for the patch release.",
-    "release_evidence": "EXE_VERIFICATION.json in release assets"
-  }
+    "conditions": "Standalone EXE extracted into a separate temporary Chinese/spaced path, with Python variables removed and a system-only PATH. Relative and absolute self-test paths checked on the build host; not a separate clean machine.",
+    "release_evidence": "EXE_VERIFICATION.json in release assets",
+    "version": "0.5.0-alpha.3"
+  },
+  "presentation_regressions": [
+    "invalid dates retain the last completed snapshot",
+    "action filters are hidden on full-snapshot age/month tabs"
+  ]
 }

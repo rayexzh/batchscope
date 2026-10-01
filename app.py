@@ -10,7 +10,7 @@ import tkinter as tk
 import tkinter.font as tkfont
 from tkinter import filedialog, messagebox, ttk
 
-from quality_ops import analyse, generate
+from quality_ops import analyse, generate, iso_date
 from comparison import compare
 from review import (FILTERS, REPORT_LABELS, STATUS_LABELS, describe_group,
                     clipboard_row, display_value, field_label, filter_details, group_details, local_label)
@@ -536,6 +536,14 @@ class Window:
         folder, as_of = Path(self.inputs.get().strip()), self.as_of.get().strip()
         if not self.inputs.get().strip() or not folder.is_dir():
             messagebox.showerror(self.t("check_input"), self.t("select_input"))
+            return
+        from_date = self.from_date.get().strip()
+        try:
+            iso_date(as_of)
+            if comparison and iso_date(from_date) > iso_date(as_of):
+                raise ValueError(self.t("date_order"))
+        except ValueError:
+            messagebox.showerror(self.t("check_input"), self.t("date_help"))
             return
         try:
             parent = output_root(ROOT)

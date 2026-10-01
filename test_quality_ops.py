@@ -275,8 +275,8 @@ class QualityTests(unittest.TestCase):
                 root.update()
                 time.sleep(.01)
             self.assertFalse(app.busy)
-        app.as_of.set("invalid")
-        run()
+        with patch("app.analyse", side_effect=ValueError("Simulated analysis failure")):
+            run()
         self.assertIn(app.t("failed"), app.status.get())
         self.assertIsNone(app.result)
         self.assertEqual(str(app.detail_button["state"]), "disabled")

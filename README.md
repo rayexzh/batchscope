@@ -4,7 +4,7 @@
 
 [![Tests](https://github.com/rayexzh/batchscope/actions/workflows/tests.yml/badge.svg)](https://github.com/rayexzh/batchscope/actions/workflows/tests.yml)
 
-[中文说明](README.zh-CN.md) · **Local desktop prototype · v0.5.0-alpha.2 · synthetic data only**
+[中文说明](README.zh-CN.md) · **Local desktop prototype · v0.5.0-alpha.3 · synthetic data only**
 
 A small pharmaceutical quality-operations portfolio project that links batches, measurements, deviations and actions in SQLite. It answers three questions using an explicit **as-of date**:
 
@@ -25,6 +25,8 @@ This project demonstrates domain-aware data modelling, Python input validation, 
 The 1080p video presents real application states with English subtitles and locally synthesized narration. It is an edited walkthrough, not the maintainer's own spoken recording. See the [production disclosure and English script](docs/DEMO_VIDEO.md).
 
 The [AI-simulated teacher review](docs/teacher-review/REPORT.zh-CN.md) reproduces 16 checks across 11 task categories and documents usability findings. No external teacher participated and no learning outcomes were measured. A [classroom worksheet with answers](docs/teacher-review/WORKSHEET.zh-CN.md) is included for future independent trials. These materials document v0.5.0-alpha.2; they do not change the application or resolve the reported usability findings.
+
+[Windows download](https://github.com/rayexzh/batchscope/releases/tag/v0.5.0-alpha.3) · [First example](docs/QUICKSTART.md) · [Documentation](docs/INDEX.md)
 
 ## Run the desktop program
 
