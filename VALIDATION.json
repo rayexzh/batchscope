@@ -1,8 +1,8 @@
 {
   "project": "BatchScope",
-  "version": "0.5.0-alpha.4",
+  "version": "0.6.0-alpha.1",
   "date": "2026-10-01",
-  "automated_tests": 47,
+  "automated_tests": 60,
   "result": "passed",
   "demo_snapshots": {
     "2026-06-30": {
@@ -113,5 +113,31 @@
     "action filters are hidden on full-snapshot age/month tabs",
     "changed inputs and dates label the previous snapshot without changing its metrics",
     "date controls retain complete labels at 900x600 and font size 14"
+  ],
+  "audit_review": {
+    "events": 6,
+    "affected_events": 4,
+    "findings": 6,
+    "source_preservation": "passed",
+    "SQL_row_join": "passed",
+    "CSV_formula_and_HTML_escape": "passed"
+  },
+  "multi_date": {
+    "quality_dates": [
+      "2026-04-30",
+      "2026-05-31",
+      "2026-06-30",
+      "2026-07-31"
+    ],
+    "same_input_import": "passed",
+    "adjacent_movements": "passed",
+    "audit_invalid_timestamps": "separate from dated counts",
+    "desktop_recovery": "passed"
+  },
+  "packaged_checks": [
+    "audit review and export",
+    "audit timeline",
+    "quality multi-date review",
+    "existing workbench and comparison"
   ]
 }

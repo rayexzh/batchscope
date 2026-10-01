@@ -1,5 +1,14 @@
 # Change log / 更新日志
 
+## v0.6.0-alpha.1 (2026-10-01) — Audit logs and multiple dates / 审计日志与多日期对比
+
+- Add synthetic audit logs, explicit role permissions and a UTC working calendar. / 新增模拟日志、明确的角色权限及 UTC 工作日历。
+- Review missing reasons, permission mismatches, unknown policy coverage and timestamp anomalies; flags are review prompts. / 复核原因缺失、权限不匹配、规则覆盖缺口及时间异常，不作违规结论。
+- Add desktop search, source evidence, fixed-snapshot batch links and full SQLite/CSV/JSON/bilingual HTML exports. / 新增桌面搜索、原始操作、固定快照批次关联和完整导出。
+- Compare 2–12 quality snapshots and adjacent-date movements; count audit events by UTC date and keep invalid timestamps separate. / 对比 2–12 个质量快照及相邻变化；审计事件按 UTC 日期统计，无效时间戳单列。
+- Add a 78-second illustrated explainer with bilingual chapter text and synthetic English narration. / 新增 78 秒动画讲解，含中英文字与合成英文旁白。
+- 13 new tests; 60 local tests pass. Rebuilt Windows EXE includes both new modules. / 新增 13 项测试，本地共 60 项通过；新版 EXE 包含两个新模块。
+
 ## v0.5.0-alpha.4 (2026-10-01) — Snapshot input clarity / 快照输入与窄窗口
 
 - Wrap date actions when the window cannot fit their full labels. / 日期操作在空间不足时换行。

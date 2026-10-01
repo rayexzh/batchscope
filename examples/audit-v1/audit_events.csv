@@ -1,0 +1,7 @@
+﻿event_id,timestamp,user_id,role,action,record_type,record_id,batch_id,old_value,new_value,reason
+E001,2026-06-29T10:00:00+00:00,demo-qc,QC,create,test_result,DEMO-T1,B0001,,99,Initial entry
+E002,2026-06-29T11:00:00+00:00,demo-qc,QC,update,test_result,DEMO-T1,B0001,99,98,
+E003,2026-06-29T23:00:00+00:00,demo-admin,admin,delete,test_result,DEMO-T1,B0001,98,,
+E004,2026-06-29T09:00:00+00:00,demo-qa,QA,update,test_result,DEMO-T1,B0001,98,97,Demonstration correction
+E005,not-a-date,demo-qa,QA,update,deviation,DEMO-D2,B0002,open,closed,Reviewed
+E006,2026-06-30T10:00:00+00:00,demo-admin,admin,access_change,account,DEMO-U1,B0002,QC,QA,Training role change

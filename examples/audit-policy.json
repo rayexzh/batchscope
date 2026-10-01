@@ -1,0 +1,11 @@
+{
+  "timezone": "UTC",
+  "work_start": 8,
+  "work_end": 18,
+  "workdays": [0, 1, 2, 3, 4],
+  "permissions": {
+    "QC": ["create", "update"],
+    "QA": ["create", "update", "delete"],
+    "admin": ["access_change"]
+  }
+}

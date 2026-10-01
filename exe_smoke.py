@@ -77,6 +77,31 @@ def self_test(folder):
         batch.window.withdraw()
         if not batch.result["actions"]:
             raise AssertionError("No batch actions in batch view.")
+        audit = window.open_audit()
+        audit.window.withdraw()
+        audit.generate()
+        if not audit.result or audit.result['affected_events'] != 4:
+            raise AssertionError('Packaged audit review failed.')
+        from audit_trail import export_audit
+        export_audit(audit.result, folder/'audit-export')
+        audit_dates = audit.timeline()
+        audit_dates.window.withdraw()
+        audit_dates.dates.set('2026-06-28,2026-06-29,2026-06-30')
+        audit_dates.start()
+        deadline = time.monotonic()+60
+        while audit_dates.busy and time.monotonic()<deadline:
+            root.update();time.sleep(.03)
+        if not audit_dates.result or len(audit_dates.result['unplaced']) != 1:
+            raise AssertionError('Packaged audit timeline failed.')
+        timeline = window.open_timeline()
+        timeline.window.withdraw()
+        timeline.dates.set('2026-05-31,2026-06-30,2026-07-31')
+        timeline.start()
+        deadline = time.monotonic()+60
+        while timeline.busy and time.monotonic()<deadline:
+            root.update();time.sleep(.03)
+        if not timeline.result or [r['open_deviations'] for r in timeline.result['rows'][-2:]] != [22,17]:
+            raise AssertionError('Packaged multi-date quality review failed.')
         fixed_id = batch.result["batch"]["batch_id"]
         window.toggle_language()
         window.toggle_theme()
@@ -99,7 +124,9 @@ def self_test(folder):
                               "work queue and backlog reconciliation","SQLite foreign keys","artifact hashes",
                               "native Generate/Analyse workflow and persistent outputs",
                               "native workbench and batch tracing","language/theme switching","comparison window",
-                              "changed-input snapshot context", "small-window date controls"],
+                              "changed-input snapshot context", "small-window date controls",
+                              "audit generation, review and SQLite export", "audit timeline and undated events",
+                              "multi-date quality snapshots and movement exports"],
                     "metrics": result["metrics"], "operations_metrics":operations["metrics"],
                     "persistent_output_root":str(output_root())}
         (folder / "SELF_TEST.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2), encoding="utf-8")

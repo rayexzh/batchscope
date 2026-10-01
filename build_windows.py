@@ -34,7 +34,7 @@ def main():
             if p.is_file():
                 shutil.copyfile(p, package / p.name)
     shutil.copyfile(root / "LICENSE", package / "LICENSE")
-    for name in ("examples","docs","sql","detail_sql","operations_sql"):
+    for name in ("examples","docs","sql","detail_sql","operations_sql","tools"):
         shutil.copytree(root / name, package / name, dirs_exist_ok=True)
     (package / "START_HERE.txt").write_text("BatchScope / 批次质量洞察\n\n1. Extract this ZIP completely. / 完整解压 ZIP。\n2. Double-click BatchScope.exe. Python is not required. / 双击 BatchScope.exe，无需 Python。\n3. Generate synthetic data, then Analyse. / 生成模拟数据后运行分析。\n4. Open Quality review workbench to trace actions and batches. / 打开质量复核工作台查看措施和批次。\n\nOutputs remain in %LOCALAPPDATA%\\BatchScope\\outputs. / 输出保存在该用户目录，不写入临时解压位置。\nSynthetic prototype only; no batch release or compliance certification. / 仅模拟原型，不用于批次放行或合规认证。\n",encoding="utf-8-sig")
     licence = Path(sys.base_prefix) / "LICENSE.txt"

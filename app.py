@@ -18,6 +18,8 @@ from ui_text import tr
 from ui_theme import apply_theme, enable_dpi_awareness
 from runtime_paths import output_root
 from workbench_ui import WorkbenchWindow
+from audit_ui import AuditWindow
+from timeline_ui import TimelineWindow
 
 ROOT = Path(__file__).resolve().parent
 PRIORITY = ["product", "test_type", "outside_range_records", "outside_range_pct", "missing_records",
@@ -143,7 +145,7 @@ class RecordTable:
     def copy_id(self):
         row = self.selected()
         if row is not None:
-            for key in ("action_id", "test_id", "deviation_id", "batch_id", "product"):
+            for key in ("event_id", "action_id", "test_id", "deviation_id", "batch_id", "product"):
                 if key in row:
                     self.copy(str(row[key]), "copy_id_done")
                     break
@@ -341,6 +343,12 @@ class Window:
         self.work_button.pack(side="left")
         self.report_button = ttk.Button(review_toolbar, command=self.open_review_report, state="disabled")
         self.report_button.pack(side="left", padx=8)
+        extra_toolbar = ttk.Frame(header)
+        extra_toolbar.pack(fill="x", pady=(6, 0))
+        self.audit_button = ttk.Button(extra_toolbar, command=self.open_audit)
+        self.audit_button.pack(side="left")
+        self.timeline_button = ttk.Button(extra_toolbar, command=self.open_timeline)
+        self.timeline_button.pack(side="left", padx=8)
         self.language_button = ttk.Button(toolbar, command=self.toggle_language)
         self.language_button.pack(side="right")
         self.theme_button = ttk.Button(toolbar, command=self.toggle_theme)
@@ -445,6 +453,8 @@ class Window:
             widget.configure(text=self.t(key))
         self.work_button.configure(text=self.t("workbench"))
         self.report_button.configure(text=self.t("open_review"))
+        self.audit_button.configure(text="审计日志复核" if self.language == "zh" else "Audit log review")
+        self.timeline_button.configure(text="多日期对比" if self.language == "zh" else "Multi-date review")
         self.language_button.configure(text="English" if self.language == "zh" else "中文")
         self.theme_button.configure(text=self.t("dark" if self.theme == "light" else "light"))
         for key, (value, label) in self.metric_cards.items():
@@ -587,7 +597,7 @@ class Window:
         self.running_inputs = (str(folder.resolve()), as_of, from_date if comparison else None)
         self.phase, self.notice = "working", None
         self.metrics.set("")
-        for control in (self.run_button, self.generate_button, self.browse_button, self.date_entry, self.input_entry, self.open_button, self.detail_button, self.compare_button, self.from_entry, self.view_compare_button, self.work_button, self.report_button):
+        for control in (self.run_button, self.generate_button, self.browse_button, self.date_entry, self.input_entry, self.open_button, self.detail_button, self.compare_button, self.from_entry, self.view_compare_button, self.work_button, self.report_button, self.audit_button, self.timeline_button):
             control.configure(state="disabled")
         self.apply_view()
         self.progress.pack(fill="x", pady=(0, 8), before=self.card_row)
@@ -617,7 +627,7 @@ class Window:
             self.busy = False
             self.progress.stop()
             self.progress.pack_forget()
-            for control in (self.run_button, self.generate_button, self.browse_button, self.date_entry, self.input_entry, self.compare_button, self.from_entry):
+            for control in (self.run_button, self.generate_button, self.browse_button, self.date_entry, self.input_entry, self.compare_button, self.from_entry, self.audit_button, self.timeline_button):
                 control.configure(state="normal")
             self.output = output if output.exists() else None
             self.open_button.configure(state="normal" if self.output else "disabled")
@@ -673,6 +683,20 @@ class Window:
             return None
         view = ComparisonWindow(self, self.result["comparison"])
         self.comparisons.append(view)
+        return view
+
+    def open_audit(self):
+        if self.busy:
+            return None
+        view = AuditWindow(self, RecordTable)
+        self.review_views.append(view)
+        return view
+
+    def open_timeline(self):
+        if self.busy:
+            return None
+        view = TimelineWindow(self, RecordTable, inputs=self.inputs.get().strip())
+        self.review_views.append(view)
         return view
 
     def open_workbench(self):

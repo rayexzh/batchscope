@@ -33,6 +33,16 @@ FILTERS = {
     "03_overdue_actions": ("overdue",),
 }
 FIELD_LABELS = {
+    "open_deviations": "未关闭偏差 / Open deviations", "overdue_actions": "逾期措施 / Overdue actions",
+    "explanation": "说明 / Explanation",
+    "date": "日期 / Date", "from_date": "起始日期 / From", "to_date": "截至日期 / To",
+    "events": "累计事件 / Cumulative events", "flagged_events": "累计待复核事件 / Cumulative flagged events",
+    "findings": "检查项 / Findings", "period_events": "本期事件 / Period events",
+    "period_flagged_events": "本期待复核事件 / Period flagged events",
+    "event_id": "事件编号 / Event ID", "rule": "检查规则 / Rule",
+    "level": "提示类型 / Finding type", "source_row": "源记录行号 / Source row",
+    "explanation_zh": "中文说明 / Chinese explanation",
+    "explanation_en": "英文说明 / English explanation",
     "manufactured_on": "批次生产日期 / Manufactured",
     "parent_status": "关联偏差状态 / Parent deviation status",
     "days_until_due": "距到期天数（负值为逾期） / Days until due (negative = late)",
