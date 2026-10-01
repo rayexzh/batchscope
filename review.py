@@ -33,6 +33,7 @@ FILTERS = {
     "03_overdue_actions": ("overdue",),
 }
 FIELD_LABELS = {
+    "review_status": "复核状态 / Review status", "reviewer": "复核人 / Reviewer", "review_note": "复核备注 / Review note",
     "open_deviations": "未关闭偏差 / Open deviations", "overdue_actions": "逾期措施 / Overdue actions",
     "explanation": "说明 / Explanation",
     "date": "日期 / Date", "from_date": "起始日期 / From", "to_date": "截至日期 / To",
@@ -106,6 +107,10 @@ def clipboard_row(columns, row, language=None):
 def display_value(field, value, language=None):
     if value is None:
         return "—"
+    if field == "review_status":
+        from audit_notes import STATUSES
+        label=STATUSES.get(value,(value,value))
+        return label[1] if language=='en' else label[0] if language=='zh' else ' / '.join(label)
     if field in ("snapshot_status", "before_status", "after_status", "parent_status"):
         return local_label(STATUS_LABELS.get(value, value), language)
     if field in ("metric", "change"):

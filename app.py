@@ -719,6 +719,9 @@ class Window:
         if self.busy:
             messagebox.showinfo(self.t("running"), self.t("wait_close"))
         else:
+            if any(hasattr(view,'confirm_close') and view.window.winfo_exists() and not view.confirm_close()
+                   for view in self.review_views):
+                return
             self.root.destroy()
 
 

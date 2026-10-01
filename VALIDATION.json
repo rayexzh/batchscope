@@ -1,8 +1,8 @@
 {
   "project": "BatchScope",
-  "version": "0.6.0-alpha.1",
+  "version": "0.6.0-alpha.2",
   "date": "2026-10-01",
-  "automated_tests": 60,
+  "automated_tests": 66,
   "result": "passed",
   "demo_snapshots": {
     "2026-06-30": {
@@ -139,5 +139,13 @@
     "audit timeline",
     "quality multi-date review",
     "existing workbench and comparison"
-  ]
+  ],
+  "review_notes": {
+    "persistence": "passed",
+    "source_and_policy_binding": "passed",
+    "revision_history": "passed",
+    "stale_editor_protection": "passed",
+    "full_export_and_escaping": "passed",
+    "desktop_filter_reopen_and_close": "passed"
+  }
 }

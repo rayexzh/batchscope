@@ -4,9 +4,9 @@ Review synthetic batch records and audit logs. Compare their changes across date
 
 用模拟数据复核批次质量记录与审计日志，支持多个日期的对比。[完整中文说明](README.zh-CN.md)
 
-[Windows download](https://github.com/rayexzh/batchscope/releases/tag/v0.6.0-alpha.1) · [78-second animation](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [Documentation](docs/INDEX.md)
+[Windows download](https://github.com/rayexzh/batchscope/releases/tag/v0.6.0-alpha.2) · [78-second animation](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [Documentation](docs/INDEX.md)
 
-**Current version: v0.6.0-alpha.1.** A local desktop demonstration using synthetic data only.
+**Current version: v0.6.0-alpha.2.** A local desktop demonstration using synthetic data only.
 
 ## What it is for
 
@@ -29,6 +29,8 @@ BatchScope links these records and shows their state at an explicit **as-of date
 Open a record to follow its links to the batch, measurements, deviations and actions. Tables support search, sorting and copying. The interface offers Chinese/English switching, themes and font-size controls.
 
 The audit example has six events and six findings affecting four events. Open a finding to inspect the original operation and policy, or follow its batch link. Audit timelines count events by UTC date; invalid timestamps are listed separately. A flag calls for review, not a violation verdict.
+
+Record a review status and reason for each finding. Notes are saved separately, return when you reopen the same log and policy, and are included in full exports. Previous revisions are retained; original findings are never removed.
 
 ## Try the built-in example
 
@@ -75,6 +77,7 @@ For command-line generation and analysis, see the [startup guide](docs/QUICKSTAR
 ## Further reading
 
 - [Audit log review and policy](docs/AUDIT_TRAIL.md)
+- [Review notes and statuses](docs/REVIEW_NOTES.md)
 - [Multi-date comparison](docs/MULTI_DATE.md)
 - [Date comparisons](docs/COMPARISON.md) and [interface guide](docs/INTERFACE.md)
 - [Business example](BUSINESS_BRIEF.md) and [SQL case study](docs/CASE_STUDY.md)

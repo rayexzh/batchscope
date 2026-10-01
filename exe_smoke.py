@@ -82,8 +82,21 @@ def self_test(folder):
         audit.generate()
         if not audit.result or audit.result['affected_events'] != 4:
             raise AssertionError('Packaged audit review failed.')
+        audit.table.tree.selection_set('0')
+        editor=audit.annotate()
+        editor.window.withdraw()
+        editor.reviewer.set('Demo QA')
+        editor.status.current(2)
+        editor.note.insert('1.0','Request original correction evidence')
+        if not editor.save():raise AssertionError('Packaged note save failed.')
+        fixed_log=audit.path
+        audit.load(fixed_log)
+        if audit.table.rows[0]['review_status']!='follow_up':
+            raise AssertionError('Packaged review notes did not reopen.')
         from audit_trail import export_audit
-        export_audit(audit.result, folder/'audit-export')
+        export_audit(audit.result, folder/'audit-export',audit.store.bundle(audit.result))
+        if not (folder/'audit-export/review-notes.json').exists():
+            raise AssertionError('Packaged review annotation export failed.')
         audit_dates = audit.timeline()
         audit_dates.window.withdraw()
         audit_dates.dates.set('2026-06-28,2026-06-29,2026-06-30')
@@ -126,7 +139,8 @@ def self_test(folder):
                               "native workbench and batch tracing","language/theme switching","comparison window",
                               "changed-input snapshot context", "small-window date controls",
                               "audit generation, review and SQLite export", "audit timeline and undated events",
-                              "multi-date quality snapshots and movement exports"],
+                              "multi-date quality snapshots and movement exports",
+                              "review note save, reopen and full export"],
                     "metrics": result["metrics"], "operations_metrics":operations["metrics"],
                     "persistent_output_root":str(output_root())}
         (folder / "SELF_TEST.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2), encoding="utf-8")

@@ -8,6 +8,7 @@
 | Understand records / 理解数据 | [Data dictionary](../DATA_DICTIONARY.md) · [Review rules](QUALITY_REVIEW.md) |
 | Compare dates / 对比日期 | [Comparison guide](COMPARISON.md) |
 | Audit event review / 审计日志复核 | [Audit rules and policy](AUDIT_TRAIL.md) |
+| Record a decision / 记录处理理由 | [Review notes and statuses](REVIEW_NOTES.md) |
 | Multiple dates / 多个日期 | [Timeline guide](MULTI_DATE.md) |
 | Short animation / 短动画 | [78-second explainer](SHORT_DEMO.md) |
 | Teacher exercise / 教学试用 | [Worksheet](teacher-review/WORKSHEET.zh-CN.md) · [AI-simulated review](teacher-review/REPORT.zh-CN.md) |

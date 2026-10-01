@@ -1,5 +1,12 @@
 # Change log / 更新日志
 
+## v0.6.0-alpha.2 (2026-10-01) — Review notes / 复核记录
+
+- Add four review statuses, reviewer-entered reasons, status filtering and note search. / 新增四种复核状态、处理理由、状态筛选与备注搜索。
+- Keep local revisions separate from source logs; bind notes to source bytes, policy and ruleset. Reject stale-editor saves. / 本地历史与原日志分开，绑定文件、配置和规则版本，拒绝旧窗口覆盖。
+- Include latest notes and revision history in complete exports. Prompt before closing unsaved edits. / 完整导出附备注与历史，未保存关闭时提示。
+- Six new tests, 66 total. The previous 78-second video remains labelled v0.6.0-alpha.1. / 新增六项测试，共 66 项；旧视频保留其版本标识。
+
 ## v0.6.0-alpha.1 (2026-10-01) — Audit logs and multiple dates / 审计日志与多日期对比
 
 - Add synthetic audit logs, explicit role permissions and a UTC working calendar. / 新增模拟日志、明确的角色权限及 UTC 工作日历。

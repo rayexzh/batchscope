@@ -126,10 +126,16 @@ def review_audit(path, policy=None):
             'affected_events': len({f['source_row'] for f in findings})}
 
 
-def export_audit(result, folder):
+def export_audit(result, folder, annotations=None):
+    if annotations is not None:
+        from audit_notes import context_id
+        if annotations['context_id'] != context_id(result):
+            raise ValueError('Annotations do not match source bytes and policy.')
     folder = Path(folder)
     folder.mkdir(parents=True, exist_ok=False)
     (folder/'audit-review.json').write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
+    if annotations is not None:
+        (folder/'review-notes.json').write_text(json.dumps(annotations,ensure_ascii=False,indent=2),encoding='utf-8')
     with closing(sqlite3.connect(folder/'audit.sqlite')) as db:
         for name, rows, columns in (
             ('events', result['events'], ['source_row']+FIELDS),
@@ -141,16 +147,29 @@ def export_audit(result, folder):
         db.execute('CREATE TABLE metadata (key TEXT PRIMARY KEY, value TEXT)')
         db.executemany('INSERT INTO metadata VALUES (?,?)',
                        [(k, json.dumps(result[k], ensure_ascii=False)) for k in ('source','sha256','policy','ruleset','reviewed_at')])
+        if annotations is not None:
+            db.execute('CREATE TABLE review_notes (source_row INTEGER, rule TEXT, revision INTEGER, status TEXT, reviewer TEXT, note TEXT, saved_at TEXT)')
+            db.executemany('INSERT INTO review_notes VALUES (?,?,?,?,?,?,?)',
+                           [[r[k] for k in ('source_row','rule','revision','status','reviewer','note','saved_at')] for r in annotations['history']])
         db.commit()
     from quality_ops import write_csv
     columns = ['source_row','event_id','batch_id','rule','level','explanation_en','explanation_zh']
     write_csv(folder/'findings.csv', columns, [[r[c] for c in columns] for r in result['findings']])
+    if annotations is not None:
+        note_columns=['source_row','rule','revision','status','reviewer','note','saved_at']
+        write_csv(folder/'review_notes.csv',note_columns,[[r[c] for c in note_columns] for r in annotations['latest']])
     for lang, index in [('en',0),('zh-CN',1)]:
         title = ['Audit log review', '审计日志复核'][index]
         scope = ['Synthetic prototype. Findings prompt review; they do not establish a regulatory violation. Input order is not a trusted event sequence. Working calendar: UTC.',
                  '模拟原型。检查结果用于复核，不构成法规违规结论。文件顺序不是可信事件顺序。工作日历：UTC。'][index]
         rows = ''.join('<tr>'+''.join('<td>'+html.escape(str(r[c]))+'</td>' for c in ['source_row','event_id','batch_id','rule','explanation_'+('en' if index==0 else 'zh')])+'</tr>' for r in result['findings'])
         body = f'<!doctype html><html lang="{lang}"><meta charset="utf-8"><title>{title}</title><style>body{{font:16px sans-serif;max-width:1100px;margin:32px auto;padding:16px}}td,th{{border:1px solid #bbb;padding:8px}}table{{border-collapse:collapse}}</style><h1>{title}</h1><p>{scope}</p><p>{len(result["events"])} events / 事件 · {result["affected_events"]} flagged / 待复核 · {len(result["findings"])} findings / 检查项</p><p>{html.escape(result["source"])}</p><p>SHA-256: {result["sha256"]}</p><pre>{html.escape(json.dumps(result["policy"],ensure_ascii=False,indent=2))}</pre><table><tr><th>Row / 行</th><th>Event / 事件</th><th>Batch / 批次</th><th>Rule / 规则</th><th>Finding / 说明</th></tr>{rows}</table></html>'
+        if annotations is not None:
+            from audit_notes import STATUSES
+            notes=''.join('<tr>'+''.join('<td>'+html.escape(str(v))+'</td>' for v in
+                       (r['source_row'],r['rule'],STATUSES[r['status']][1 if index==0 else 0],r['reviewer'],r['note'],r['saved_at']))+'</tr>' for r in annotations['latest'])
+            section='<h2>Review notes / 复核备注</h2><p>Reviewer-entered notes; original findings remain unchanged. / 人工备注不改变原始检查项。</p><table><tr><th>Row / 行</th><th>Rule / 规则</th><th>Status / 状态</th><th>Reviewer / 复核人</th><th>Note / 理由</th><th>UTC</th></tr>'+notes+'</table>'
+            body=body.replace('</html>',section+'</html>')
         (folder/f'AUDIT.{lang}.html').write_text(body,encoding='utf-8')
     (folder/'manifest.json').write_text(json.dumps({
         'complete': True, 'source_sha256': result['sha256'], 'ruleset': result['ruleset'],

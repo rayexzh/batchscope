@@ -15,7 +15,7 @@ from runtime_paths import RESOURCE_ROOT
 from workbench import build_operations, export_operations
 
 ROOT = RESOURCE_ROOT
-VERSION = "0.6.0-alpha.1"
+VERSION = "0.6.0-alpha.2"
 COLUMNS = {
     "batches": "batch_id product manufactured_on".split(),
     "test_results": "test_id batch_id test_type method value unit spec_low spec_high spec_unit measured_on".split(),
