@@ -193,7 +193,17 @@ class NoteEditor:
         self.revision=current.get('revision',0)
         self.window=tk.Toplevel(view.window);self.window.geometry('850x650');self.window.minsize(700,500)
         self.window.protocol('WM_DELETE_WINDOW',self.close)
-        frame=ttk.Frame(self.window,padding=16);frame.pack(fill='both',expand=True)
+        body=ttk.Frame(self.window);body.pack(fill='both',expand=True)
+        self.canvas=tk.Canvas(body,highlightthickness=0)
+        scrollbar=ttk.Scrollbar(body,orient='vertical',command=self.canvas.yview)
+        scrollbar.pack(side='right',fill='y')
+        self.canvas.configure(yscrollcommand=scrollbar.set)
+        self.canvas.pack(side='left',fill='both',expand=True)
+        frame=ttk.Frame(self.canvas,padding=16)
+        content=self.canvas.create_window((0,0),window=frame,anchor='nw')
+        frame.bind('<Configure>',lambda event:self.canvas.configure(scrollregion=self.canvas.bbox('all')))
+        self.canvas.bind('<Configure>',lambda event:self.canvas.itemconfigure(content,width=event.width))
+        self.window.bind('<MouseWheel>',self.scroll,add='+')
         self.title=ttk.Label(frame,style='Title.TLabel');self.title.pack(anchor='w')
         ttk.Label(frame,text=f'{row["event_id"]} · {row["rule"]} · row {row["source_row"]}\nSHA-256: {result["sha256"]}',wraplength=790).pack(fill='x',pady=8)
         self.status=ttk.Combobox(frame,state='readonly');self.status.pack(fill='x',pady=5)
@@ -203,13 +213,19 @@ class NoteEditor:
         self.reviewer=tk.StringVar(value=current.get('reviewer',''))
         ttk.Entry(frame,textvariable=self.reviewer).pack(fill='x',pady=4)
         self.note_label=ttk.Label(frame);self.note_label.pack(anchor='w')
-        self.note=tk.Text(frame,height=6,wrap='word',font='TkDefaultFont');self.note.pack(fill='both',expand=True,pady=5)
+        self.note=tk.Text(frame,height=6,wrap='word',font='TkDefaultFont');self.note.pack(fill='x',pady=5)
         self.note.insert('1.0',current.get('note',''))
         self.original=(self.status_code,self.reviewer.get().strip(),self.note.get('1.0','end').strip())
-        self.save_button=ttk.Button(frame,command=self.save);self.save_button.pack(anchor='w',pady=6)
-        self.notice=ttk.Label(frame,wraplength=790);self.notice.pack(fill='x')
         self.history_text=tk.Text(frame,height=5,wrap='word',font='TkDefaultFont');self.history_text.pack(fill='both',expand=True,pady=5)
+        footer=ttk.Frame(self.window,padding=(16,4,16,8));footer.pack(fill='x')
+        self.save_button=ttk.Button(footer,command=self.save);self.save_button.pack(side='left',padx=(0,12))
+        self.notice=ttk.Label(footer,wraplength=560);self.notice.pack(side='left',fill='x',expand=True)
         self.apply_view();self.status.current(list(STATUSES).index(self.status_code));self.show_history()
+
+    def scroll(self,event):
+        if event.delta and not isinstance(event.widget,tk.Text):
+            self.canvas.yview_scroll(-1 if event.delta>0 else 1,'units')
+            return 'break'
 
     def apply_view(self):
         zh=self.view.owner.language=='zh'
@@ -221,6 +237,7 @@ class NoteEditor:
         self.note_label.configure(text='备注或处理理由' if zh else 'Note or decision reason')
         self.save_button.configure(text='保存复核记录' if zh else 'Save review note')
         self.notice.configure(text='状态不改变原始检查结果；历史记录不是防篡改审计追踪。' if zh else 'Status does not change findings; local history is not tamper-proof.')
+        self.canvas.configure(background=self.view.owner.colors['background'])
         self.note.configure(background=self.view.owner.colors['surface'],foreground=self.view.owner.colors['text'],insertbackground=self.view.owner.colors['text'])
         self.history_text.configure(background=self.view.owner.colors['surface'],foreground=self.view.owner.colors['text'])
 

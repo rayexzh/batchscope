@@ -4,9 +4,9 @@
 
 Review synthetic batch records and audit logs. Compare their changes across dates. [Full English README](README.md)
 
-[下载 Windows 版](https://github.com/rayexzh/batchscope/releases/tag/v0.6.0-alpha.2) · [78 秒动画](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [文档目录](docs/INDEX.md)
+[下载 Windows 版](https://github.com/rayexzh/batchscope/releases/tag/v0.6.0-alpha.3) · [78 秒动画](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [文档目录](docs/INDEX.md)
 
-**当前版本：v0.6.0-alpha.2。** 本地桌面演示程序，仅使用模拟数据。
+**当前版本：v0.6.0-alpha.3。** 本地桌面演示程序，仅使用模拟数据。
 
 ## 解决什么问题
 
@@ -62,7 +62,7 @@ BatchScope 把这些记录关联起来，按指定的**截至日期**还原当�
 
 检验范围是模拟设定。超范围或逾期只是复核线索，不能据此判定根因、认证合规或放行批次。程序没有电子签名或生产环境权限管理，不能替代经过验证的药企质量管理系统。
 
-Windows 程序未签名。已有测试和脚本化试用记录，但没有声称真实企业部署或老师背书。详见[质量复核说明](docs/QUALITY_REVIEW.md)和[脚本化试用记录](docs/SIMULATED-USABILITY-REVIEW.md)。
+Windows 程序未签名。已有测试和脚本化试用记录，但没有声称真实企业部署或老师背书。详见[质量复核说明](docs/QUALITY_REVIEW.md)和[模拟岗位试用记录](docs/SIMULATED-ROLE-REVIEW-2026-10-04.md)。
 
 ## 从源码运行
 

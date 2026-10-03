@@ -1,5 +1,11 @@
 # Change log / 更新日志
 
+## v0.6.0-alpha.3 (2026-10-04) — Review-note layout / 复核记录窗口
+
+- Make the note form scrollable at its minimum size and keep the save action visible. / 最小窗口下可滚动查看修改历史，保存按钮保持可见。
+- Add a geometry regression and packaged check; 67 source tests pass. / 新增界面及 EXE 检查；67 项源码测试通过。
+- Document task-based AI role walkthroughs separately from real user feedback. The existing animation remains labelled v0.6.0-alpha.1. / 单独记录模拟岗位试用，不冒充真人反馈；原动画保留原版本标识。
+
 ## v0.6.0-alpha.2 (2026-10-01) — Review notes / 复核记录
 
 - Add four review statuses, reviewer-entered reasons, status filtering and note search. / 新增四种复核状态、处理理由、状态筛选与备注搜索。

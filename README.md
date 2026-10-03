@@ -4,9 +4,9 @@ Review synthetic batch records and audit logs. Compare their changes across date
 
 用模拟数据复核批次质量记录与审计日志，支持多个日期的对比。[完整中文说明](README.zh-CN.md)
 
-[Windows download](https://github.com/rayexzh/batchscope/releases/tag/v0.6.0-alpha.2) · [78-second animation](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [Documentation](docs/INDEX.md)
+[Windows download](https://github.com/rayexzh/batchscope/releases/tag/v0.6.0-alpha.3) · [78-second animation](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [Documentation](docs/INDEX.md)
 
-**Current version: v0.6.0-alpha.2.** A local desktop demonstration using synthetic data only.
+**Current version: v0.6.0-alpha.3.** A local desktop demonstration using synthetic data only.
 
 ## What it is for
 
@@ -62,7 +62,7 @@ Each completed run produces a SQLite database, CSV summaries and details, an off
 
 Configured ranges are fictional. A range flag or overdue action calls for review; it does not establish root cause, certify compliance or authorise batch release. The program has no electronic signatures or production access-control system. It is not a validated replacement for a pharmaceutical quality-management system.
 
-The Windows executable is unsigned. Tests and scripted usability checks are documented, but no external deployment or teacher endorsement is claimed. See the [quality review notes](docs/QUALITY_REVIEW.md) and [scripted usability review](docs/SIMULATED-USABILITY-REVIEW.md).
+The Windows executable is unsigned. Tests and scripted usability checks are documented, but no external deployment or teacher endorsement is claimed. See the [quality review notes](docs/QUALITY_REVIEW.md) and [simulated role review](docs/SIMULATED-ROLE-REVIEW-2026-10-04.md).
 
 ## Run from source
 

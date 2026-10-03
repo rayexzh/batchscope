@@ -89,6 +89,14 @@ def self_test(folder):
         editor.status.current(2)
         editor.note.insert('1.0','Request original correction evidence')
         if not editor.save():raise AssertionError('Packaged note save failed.')
+        editor.window.deiconify();editor.window.geometry('700x500');root.update()
+        editor.canvas.yview_moveto(1);root.update()
+        top=editor.canvas.winfo_rooty()
+        if (not editor.save_button.winfo_ismapped()
+                or editor.history_text.winfo_rooty()<top
+                or editor.history_text.winfo_rooty()+editor.history_text.winfo_height()>top+editor.canvas.winfo_height()):
+            raise AssertionError('Packaged note history or save action is clipped at minimum size.')
+        editor.window.withdraw()
         fixed_log=audit.path
         audit.load(fixed_log)
         if audit.table.rows[0]['review_status']!='follow_up':
@@ -140,7 +148,8 @@ def self_test(folder):
                               "changed-input snapshot context", "small-window date controls",
                               "audit generation, review and SQLite export", "audit timeline and undated events",
                               "multi-date quality snapshots and movement exports",
-                              "review note save, reopen and full export"],
+                              "review note save, reopen and full export",
+                              "review note history at minimum window size"],
                     "metrics": result["metrics"], "operations_metrics":operations["metrics"],
                     "persistent_output_root":str(output_root())}
         (folder / "SELF_TEST.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2), encoding="utf-8")

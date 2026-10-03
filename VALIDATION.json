@@ -1,8 +1,8 @@
 {
   "project": "BatchScope",
-  "version": "0.6.0-alpha.2",
-  "date": "2026-10-01",
-  "automated_tests": 66,
+  "version": "0.6.0-alpha.3",
+  "date": "2026-10-04",
+  "automated_tests": 67,
   "result": "passed",
   "demo_snapshots": {
     "2026-06-30": {
@@ -146,6 +146,7 @@
     "revision_history": "passed",
     "stale_editor_protection": "passed",
     "full_export_and_escaping": "passed",
-    "desktop_filter_reopen_and_close": "passed"
+    "desktop_filter_reopen_and_close": "passed",
+    "minimum_window_history_and_save": "passed"
   }
 }

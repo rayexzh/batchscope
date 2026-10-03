@@ -90,5 +90,25 @@ class NoteTests(unittest.TestCase):
             self.assertEqual(second.table.rows[0]['review_status'],'explained')
         finally:root.destroy()
 
+    def test_small_review_window_can_reach_history_and_save(self):
+        from app import Window
+        root=tk.Tk();root.withdraw()
+        try:
+            app=Window(root);view=app.open_audit();view.store=self.store
+            view.load(self.path);view.table.tree.selection_set('0')
+            editor=view.annotate();editor.window.geometry('700x500')
+            editor.reviewer.set('Demo QA');editor.status.current(2)
+            editor.note.insert('1.0','Check the original operation.')
+            self.assertIsNotNone(editor.save())
+            root.update()
+            self.assertTrue(editor.save_button.winfo_ismapped())
+            self.assertGreater(editor.canvas.bbox('all')[3],editor.canvas.winfo_height())
+            editor.canvas.yview_moveto(1);root.update()
+            top=editor.canvas.winfo_rooty()
+            self.assertGreaterEqual(editor.history_text.winfo_rooty(),top)
+            self.assertLessEqual(editor.history_text.winfo_rooty()+editor.history_text.winfo_height(),
+                                 top+editor.canvas.winfo_height())
+        finally:root.destroy()
+
 
 if __name__=='__main__':unittest.main()
