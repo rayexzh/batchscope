@@ -1,5 +1,7 @@
 # BatchScope documentation / 文档导航
 
+Current release / 当前版本：[v0.6.0-alpha.4 audit import check / 审计日志导入检查](RELEASE-v0.6.0-alpha.4.md).
+
 | Need / 需要 | Read / 入口 |
 |---|---|
 | First run / 第一次运行 | [Quick start](QUICKSTART.md) · [Windows build](WINDOWS_BUILD.md) |

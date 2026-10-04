@@ -1,8 +1,8 @@
 {
   "project": "BatchScope",
-  "version": "0.6.0-alpha.3",
+  "version": "0.6.0-alpha.4",
   "date": "2026-10-04",
-  "automated_tests": 67,
+  "automated_tests": 68,
   "result": "passed",
   "demo_snapshots": {
     "2026-06-30": {
@@ -120,7 +120,8 @@
     "findings": 6,
     "source_preservation": "passed",
     "SQL_row_join": "passed",
-    "CSV_formula_and_HTML_escape": "passed"
+    "CSV_formula_and_HTML_escape": "passed",
+    "read_only_header_inspection": "passed"
   },
   "multi_date": {
     "quality_dates": [
@@ -136,6 +137,7 @@
   },
   "packaged_checks": [
     "audit review and export",
+    "read-only audit CSV header inspection",
     "audit timeline",
     "quality multi-date review",
     "existing workbench and comparison"

@@ -29,6 +29,43 @@ LABELS = {
 }
 
 
+def header_diagnostic(found, language='en'):
+    """Explain the documented import shape without silently remapping columns."""
+    if found == FIELDS:
+        return None
+    found = found or []
+    missing = [field for field in FIELDS if field not in found]
+    extra = [field for field in found if field not in FIELDS]
+    problems = []
+    zh = language == 'zh'
+    if missing:
+        problems.append(('缺少字段：' if zh else 'Missing columns: ') + ', '.join(missing))
+    if extra:
+        problems.append(('多余字段：' if zh else 'Unexpected columns: ') + ', '.join(extra))
+    if not missing and not extra:
+        problems.append('字段顺序不符或字段名重复' if zh else 'Columns have the wrong order or repeated names')
+    problems.append(('需要按此顺序排列：' if zh else 'Expected columns in this order: ') + ', '.join(FIELDS))
+    problems.append(('检测到：' if zh else 'Detected: ') + (', '.join(found) if found else ('（空文件）' if zh else '(empty file)')))
+    return '\n'.join(problems)
+
+
+def inspect_audit_csv(path, max_bytes=5_000_000):
+    """Read only the CSV header; this is a format check, not a data review."""
+    path = Path(path)
+    size = path.stat().st_size
+    if size > max_bytes:
+        raise ValueError(f'Desktop demo limit: 5 MB (file has {size:,} bytes). Use audit_trail.py for larger files.')
+    try:
+        with path.open('r', encoding='utf-8-sig', newline='') as handle:
+            found = next(csv.reader(handle, strict=True), [])
+    except UnicodeError as exc:
+        raise ValueError('Audit CSV header must be UTF-8 encoded.') from exc
+    except csv.Error as exc:
+        raise ValueError('Cannot parse audit CSV header: ' + str(exc)) from exc
+    return {'size_bytes': size, 'columns': found, 'diagnostic': header_diagnostic(found),
+            'diagnostic_zh': header_diagnostic(found, 'zh')}
+
+
 def validate_policy(policy):
     if not isinstance(policy, dict) or not all(k in policy for k in POLICY):
         raise ValueError('Policy must contain timezone, work_start, work_end, workdays and permissions.')
@@ -75,7 +112,7 @@ def review_audit(path, policy=None):
     import io
     reader = csv.DictReader(io.StringIO(raw.decode('utf-8-sig'), newline=''))
     if reader.fieldnames != FIELDS:
-        raise ValueError('Expected audit columns in the documented order: ' + ', '.join(FIELDS))
+        raise ValueError(header_diagnostic(reader.fieldnames))
     try:
         input_rows = list(reader)
     except csv.Error as exc:

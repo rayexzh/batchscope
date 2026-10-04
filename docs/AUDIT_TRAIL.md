@@ -16,6 +16,8 @@ CSV columns, in order / CSV 列及顺序：
 event_id,timestamp,user_id,role,action,record_type,record_id,batch_id,old_value,new_value,reason
 ```
 
+Before importing, use **Check import format / 检查导入格式** to inspect the header without replacing the current review. The result identifies missing, extra or reordered columns. It checks only the header and file size; a matching header does not validate event contents or prove data integrity. / 导入前可先检查格式；只读检查表头和大小，指出缺失、多余或顺序不符的字段。通过检查不代表事件内容正确或符合数据完整性要求。
+
 Timestamp: ISO 8601 with offset, e.g. `2026-06-29T10:00:00+00:00`. Original cells are retained. Identity fields cannot be blank; a batch link may be absent. Supported actions: `create`, `update`, `delete`, `access_change`. / 时间戳须含时区，保留原始单元格。身份字段不能为空，批次关联可为空。
 
 ## Rules / 规则

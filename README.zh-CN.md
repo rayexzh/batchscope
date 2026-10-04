@@ -4,9 +4,9 @@
 
 Review synthetic batch records and audit logs. Compare their changes across dates. [Full English README](README.md)
 
-[下载 Windows 版](https://github.com/rayexzh/batchscope/releases/tag/v0.6.0-alpha.3) · [78 秒动画](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [文档目录](docs/INDEX.md)
+[下载 Windows 版](https://github.com/rayexzh/batchscope/releases/tag/v0.6.0-alpha.4) · [78 秒动画](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [文档目录](docs/INDEX.md)
 
-**当前版本：v0.6.0-alpha.3。** 本地桌面演示程序，仅使用模拟数据。
+**当前版本：v0.6.0-alpha.4。** 本地桌面演示程序，仅使用模拟数据。
 
 ## 解决什么问题
 
@@ -28,7 +28,7 @@ BatchScope 把这些记录关联起来，按指定的**截至日期**还原当�
 
 打开记录后，可以沿关联查看批次、检验、偏差和措施。表格支持搜索、排序和复制；界面支持中英文切换、主题和字号调整。
 
-审计示例有 6 条事件，产生 6 个检查项，涉及 4 条事件。打开检查项可查看原始操作和规则配置，也能查看对应批次。时间线按 UTC 操作日期统计，无效时间戳单列。标记只提示复核，不判定违规。
+审计示例有 6 条事件，产生 6 个检查项，涉及 4 条事件。导入前可只读检查 CSV 格式；字段不匹配会逐项提示，不会覆盖当前复核。打开检查项可查看原始操作和规则配置，也能查看对应批次。时间线按 UTC 操作日期统计，无效时间戳单列。标记只提示复核，不判定违规。
 
 每条检查项可填写处理状态和理由。备注单独保存，重新打开相同日志与配置时恢复，并进入完整导出。历史版本保留，不删除原始检查项。
 

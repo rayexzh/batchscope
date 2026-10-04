@@ -1,5 +1,11 @@
 # Change log / 更新日志
 
+## v0.6.0-alpha.4 (2026-10-04) — Audit CSV import check / 审计日志导入检查
+
+- Check a log CSV's header before import and show missing, extra or reordered fields. / 导入前检查表头，明确提示缺失、多余或顺序不符的字段。
+- Offer a read-only format check without changing the current review. / 增加只读格式检查，不覆盖当前复核结果。
+- Preserve the documented 5 MB desktop limit and UTC-only policy; this is not a general LIMS adapter. / 保留桌面版 5 MB 和 UTC 限制；不声称兼容所有 LIMS。
+
 ## v0.6.0-alpha.3 (2026-10-04) — Review-note layout / 复核记录窗口
 
 - Make the note form scrollable at its minimum size and keep the save action visible. / 最小窗口下可滚动查看修改历史，保存按钮保持可见。

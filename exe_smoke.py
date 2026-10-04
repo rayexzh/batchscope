@@ -82,6 +82,13 @@ def self_test(folder):
         audit.generate()
         if not audit.result or audit.result['affected_events'] != 4:
             raise AssertionError('Packaged audit review failed.')
+        from audit_trail import inspect_audit_csv
+        if inspect_audit_csv(audit.path)['diagnostic'] is not None:
+            raise AssertionError('Packaged audit import format check rejected its own sample.')
+        mismatched=folder/'wrong-audit-header.csv'
+        mismatched.write_text('event_id,timestamp,comment\n',encoding='utf-8')
+        if 'Missing columns' not in (inspect_audit_csv(mismatched)['diagnostic'] or ''):
+            raise AssertionError('Packaged audit import format check did not explain missing fields.')
         audit.table.tree.selection_set('0')
         editor=audit.annotate()
         editor.window.withdraw()
@@ -147,6 +154,7 @@ def self_test(folder):
                               "native workbench and batch tracing","language/theme switching","comparison window",
                               "changed-input snapshot context", "small-window date controls",
                               "audit generation, review and SQLite export", "audit timeline and undated events",
+                              "read-only audit CSV header inspection",
                               "multi-date quality snapshots and movement exports",
                               "review note save, reopen and full export",
                               "review note history at minimum window size"],

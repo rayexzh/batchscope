@@ -6,7 +6,7 @@ import tempfile
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
-from audit_trail import POLICY, export_audit, generate_audit, review_audit
+from audit_trail import POLICY, export_audit, generate_audit, inspect_audit_csv, review_audit
 from runtime_paths import output_root
 from workbench_ui import BatchWindow
 from audit_notes import NoteStore, STATUSES
@@ -15,6 +15,7 @@ TEXT = {
  'title': ('审计日志复核', 'Audit log review'),
  'generate': ('生成模拟日志', 'Generate sample log'),
  'open': ('打开日志 CSV', 'Open log CSV'),
+ 'format': ('检查导入格式', 'Check import format'),
  'export': ('导出完整报告', 'Export full report'),
  'batch': ('查看对应批次', 'Open linked batch'),
  'policy': ('选择规则 JSON', 'Choose policy JSON'),
@@ -39,10 +40,11 @@ class AuditWindow:
         frame = ttk.Frame(self.window, padding=18); frame.pack(fill='both',expand=True)
         self.title = ttk.Label(frame,style='Title.TLabel'); self.title.pack(anchor='w')
         self.buttons = {}
-        for keys in [('generate','open','policy'),('export','batch','timeline')]:
+        for keys in [('generate','open','format','policy'),('export','batch','timeline')]:
             row = ttk.Frame(frame); row.pack(fill='x',pady=6)
             for key in keys:
-                button = ttk.Button(row,command=self.choose_policy if key=='policy' else getattr(self,key)); button.pack(side='left',padx=(0,8))
+                command = self.choose_policy if key=='policy' else self.check_format if key=='format' else getattr(self,key)
+                button = ttk.Button(row,command=command); button.pack(side='left',padx=(0,8))
                 self.buttons[key]=button
         self.caption = ttk.Label(frame,wraplength=800); self.caption.pack(fill='x',pady=8)
         self.search_label = ttk.Label(frame); self.search_label.pack(anchor='w')
@@ -107,8 +109,27 @@ class AuditWindow:
     def open(self):
         path=filedialog.askopenfilename(parent=self.window,filetypes=[('CSV','*.csv')])
         if path:
-            try:self.load(path)
+            try:
+                report=inspect_audit_csv(path)
+                if report['diagnostic']:
+                    raise ValueError(report['diagnostic_zh'] if self.owner.language=='zh' else report['diagnostic'])
+                self.load(path)
             except (ValueError,OSError,UnicodeError,sqlite3.Error) as exc:messagebox.showerror(self.text('title'),str(exc),parent=self.window)
+
+    def check_format(self):
+        path=filedialog.askopenfilename(parent=self.window,filetypes=[('CSV','*.csv')])
+        if not path:return
+        try:
+            report=inspect_audit_csv(path)
+            if report['diagnostic']:
+                messagebox.showwarning(self.text('format'),
+                    report['diagnostic_zh'] if self.owner.language=='zh' else report['diagnostic'],parent=self.window)
+            else:
+                message=('字段与示例格式一致；尚未检查记录内容，也不代表数据完整性合格。' if self.owner.language=='zh'
+                         else 'Columns match the sample format. Record contents and data integrity have not been checked.')
+                messagebox.showinfo(self.text('format'),message,parent=self.window)
+        except (ValueError,OSError) as exc:
+            messagebox.showerror(self.text('format'),str(exc),parent=self.window)
 
     def choose_policy(self):
         path=filedialog.askopenfilename(parent=self.window,filetypes=[('JSON','*.json')])

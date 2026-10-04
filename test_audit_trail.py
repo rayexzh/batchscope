@@ -6,8 +6,9 @@ import sqlite3
 import tempfile
 import tkinter as tk
 import unittest
+from unittest.mock import patch
 
-from audit_trail import FIELDS, POLICY, export_audit, generate_audit, review_audit
+from audit_trail import FIELDS, POLICY, export_audit, generate_audit, inspect_audit_csv, review_audit
 
 
 class AuditTests(unittest.TestCase):
@@ -63,7 +64,28 @@ class AuditTests(unittest.TestCase):
 
     def test_malformed_csv_fails_without_partial_review(self):
         self.path.write_text('bad,header\n1,2',encoding='utf-8')
-        with self.assertRaises(ValueError):review_audit(self.path)
+        with self.assertRaisesRegex(ValueError,'Missing columns'):
+            review_audit(self.path)
+
+    def test_import_format_inspection_is_read_only_and_reports_exact_mismatch(self):
+        before=self.path.read_bytes()
+        report=inspect_audit_csv(self.path)
+        self.assertIsNone(report['diagnostic'])
+        self.assertEqual(report['columns'],FIELDS)
+        self.assertEqual(self.path.read_bytes(),before)
+        self.path.write_text(','.join(FIELDS[:-1]+['comment'])+'\n',encoding='utf-8')
+        report=inspect_audit_csv(self.path)
+        self.assertIn('Missing columns: reason',report['diagnostic'])
+        self.assertIn('Unexpected columns: comment',report['diagnostic'])
+        self.assertIn('缺少字段：reason',report['diagnostic_zh'])
+        self.assertIn('Detected:',report['diagnostic'])
+        self.path.write_text(','.join(reversed(FIELDS))+'\n',encoding='utf-8')
+        self.assertIn('wrong order',inspect_audit_csv(self.path)['diagnostic'])
+        self.path.write_bytes(b'\xff,not-utf8\n')
+        with self.assertRaisesRegex(ValueError,'UTF-8'):
+            inspect_audit_csv(self.path)
+        with self.assertRaisesRegex(ValueError,'5 MB'):
+            inspect_audit_csv(self.path,max_bytes=1)
 
     def test_oversized_cell_gives_recoverable_error(self):
         row={key:'' for key in FIELDS};row['reason']='x'*(csv.field_size_limit()+1)
@@ -83,6 +105,19 @@ class AuditTests(unittest.TestCase):
             path=generate_audit(self.root/'linked.csv',[result['operations']['batches'][0]['batch_id']])
             view.load(path)
             self.assertEqual(len(view.table.rows),6)
+            with patch('audit_ui.filedialog.askopenfilename',return_value=str(path)), \
+                 patch('audit_ui.messagebox.showinfo') as information:
+                view.buttons['format'].invoke()
+                information.assert_called_once()
+            self.assertEqual(view.path,path)
+            invalid=self.root/'unknown-format.csv'
+            invalid.write_text('event_id,comment\nE1,text\n',encoding='utf-8')
+            original=view.result
+            with patch('audit_ui.filedialog.askopenfilename',return_value=str(invalid)), \
+                 patch('audit_ui.messagebox.showwarning') as warning:
+                view.buttons['format'].invoke()
+                self.assertIn('缺少字段',warning.call_args.args[1])
+            self.assertIs(view.result,original)
             view.search.set('demo-admin');self.assertEqual(len(view.table.rows),3)
             owner.toggle_language();self.assertEqual(view.title.cget('text'),'Audit log review')
             view.table.tree.selection_set('0')
