@@ -4,9 +4,9 @@ Review synthetic batch records and audit logs. Compare their changes across date
 
 用模拟数据复核批次质量记录与审计日志，支持多个日期的对比。[完整中文说明](README.zh-CN.md)
 
-[Windows download](https://github.com/rayexzh/batchscope/releases/tag/v0.6.0-alpha.4) · [78-second animation](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [Documentation](docs/INDEX.md)
+[Windows download](https://github.com/rayexzh/batchscope/releases/tag/v0.6.0-alpha.5) · [78-second animation](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [Documentation](docs/INDEX.md)
 
-**Current version: v0.6.0-alpha.4.** A local desktop demonstration using synthetic data only.
+**Current version: v0.6.0-alpha.5.** A local desktop demonstration using synthetic data only.
 
 ## What it is for
 

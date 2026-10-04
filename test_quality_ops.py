@@ -129,6 +129,18 @@ class QualityTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.run_case("20260630", "bad-date")
 
+    def test_truncated_quoted_input_blocks_analysis_with_issue_report(self):
+        source = self.inputs / 'actions.csv'
+        write_csv(source, COLUMNS['actions'], [self.data['actions'][0]])
+        damaged = source.read_text(encoding='utf-8-sig').rstrip('\r\n')
+        self.assertTrue(damaged.endswith(',2026-07-01'))
+        source.write_text(damaged[:-len('2026-07-01')] + '"2026-07-01', encoding='utf-8')
+        with self.assertRaises(ValueError):
+            self.run_case()
+        report = (self.root / 'results/INPUT_ISSUES.csv').read_text(encoding='utf-8-sig')
+        self.assertIn('Malformed CSV', report)
+        self.assertFalse((self.root / 'results/quality.sqlite').exists())
+
     def test_provenance_and_preservation(self):
         (self.inputs / "SOURCE.json").write_text('{"data_type":"real"}', encoding="utf-8")
         with self.assertRaises(ValueError):

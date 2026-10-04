@@ -1,8 +1,8 @@
 {
   "project": "BatchScope",
-  "version": "0.6.0-alpha.4",
+  "version": "0.6.0-alpha.5",
   "date": "2026-10-04",
-  "automated_tests": 68,
+  "automated_tests": 70,
   "result": "passed",
   "demo_snapshots": {
     "2026-06-30": {

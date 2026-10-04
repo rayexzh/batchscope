@@ -12,6 +12,15 @@ from audit_trail import FIELDS, POLICY, export_audit, generate_audit, inspect_au
 
 
 class AuditTests(unittest.TestCase):
+    def test_unterminated_quoted_record_is_rejected(self):
+        row = {key: '' for key in FIELDS}
+        row.update(event_id='E001', user_id='u1', role='analyst', action='update',
+                   record_type='test', record_id='R001', timestamp='2026-06-29T10:00:00Z')
+        self.path.write_text(','.join(FIELDS) + '\n' +
+                             ','.join(row[key] for key in FIELDS[:-1]) + ',"truncated\n', encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, 'Cannot parse audit CSV'):
+            review_audit(self.path)
+
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
         self.root=Path(self.temp.name);self.path=generate_audit(self.root/'events.csv')

@@ -1,5 +1,11 @@
 # Change log / 更新日志
 
+## v0.6.0-alpha.5 (2026-10-04) — Reject truncated CSV / 拒绝截断 CSV
+
+- Reject quoted fields cut off at end of audit logs or quality input files. / 审计日志与质量输入文件中的引号未闭合记录不再被误读。
+- Quality inputs now produce an `INPUT_ISSUES.csv` entry and stop before creating analysis outputs; audit import preserves the prior review on error. / 质量输入错误写入问题清单并阻止分析输出；审计导入出错时保留上一份复核。
+- Added regressions for both workflows. Simulated QA/QC review is not regulatory validation or external user feedback. / 两条流程均有回归测试；模拟岗位试用不等于法规验证或外部用户反馈。
+
 ## v0.6.0-alpha.4 (2026-10-04) — Audit CSV import check / 审计日志导入检查
 
 - Check a log CSV's header before import and show missing, extra or reordered fields. / 导入前检查表头，明确提示缺失、多余或顺序不符的字段。

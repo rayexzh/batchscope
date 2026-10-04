@@ -15,7 +15,7 @@ from runtime_paths import RESOURCE_ROOT
 from workbench import build_operations, export_operations
 
 ROOT = RESOURCE_ROOT
-VERSION = "0.6.0-alpha.4"
+VERSION = "0.6.0-alpha.5"
 COLUMNS = {
     "batches": "batch_id product manufactured_on".split(),
     "test_results": "test_id batch_id test_type method value unit spec_low spec_high spec_unit measured_on".split(),
@@ -94,11 +94,17 @@ def load_inputs(folder):
         data[table] = []
         seen = set()
         with (Path(folder) / f"{table}.csv").open(encoding="utf-8-sig", newline="") as handle:
-            reader = csv.DictReader(handle)
-            if reader.fieldnames != columns:
+            reader = csv.DictReader(handle, strict=True)
+            try:
+                found_headers = reader.fieldnames
+                records = list(reader) if found_headers == columns else []
+            except csv.Error as exc:
+                issue(table, max(reader.line_num, 1), 'csv', f'Malformed CSV: {exc}')
+                continue
+            if found_headers != columns:
                 issue(table, 1, "header", "Expected exact documented columns and order.")
                 continue
-            for line, row in enumerate(reader, 2):
+            for line, row in enumerate(records, 2):
                 if None in row or None in row.values():
                     issue(table, line, "row", "Incorrect number of cells.")
                     continue

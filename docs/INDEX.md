@@ -1,6 +1,6 @@
 # BatchScope documentation / 文档导航
 
-Current release / 当前版本：[v0.6.0-alpha.4 audit import check / 审计日志导入检查](RELEASE-v0.6.0-alpha.4.md).
+Current release / 当前版本：[v0.6.0-alpha.5 truncated CSV checks / 截断 CSV 检查](RELEASE-v0.6.0-alpha.5.md).
 
 | Need / 需要 | Read / 入口 |
 |---|---|

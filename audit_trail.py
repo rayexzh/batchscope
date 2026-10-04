@@ -110,10 +110,10 @@ def review_audit(path, policy=None):
     # Read once: provenance and parsed records refer to the same source bytes.
     raw = Path(path).read_bytes()
     import io
-    reader = csv.DictReader(io.StringIO(raw.decode('utf-8-sig'), newline=''))
-    if reader.fieldnames != FIELDS:
-        raise ValueError(header_diagnostic(reader.fieldnames))
+    reader = csv.DictReader(io.StringIO(raw.decode('utf-8-sig'), newline=''), strict=True)
     try:
+        if reader.fieldnames != FIELDS:
+            raise ValueError(header_diagnostic(reader.fieldnames))
         input_rows = list(reader)
     except csv.Error as exc:
         raise ValueError('Cannot parse audit CSV: ' + str(exc)) from exc
