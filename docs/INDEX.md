@@ -12,7 +12,7 @@ Current release / 当前版本：[v0.6.0-alpha.5 truncated CSV checks / 截断 C
 | Audit event review / 审计日志复核 | [Audit rules and policy](AUDIT_TRAIL.md) |
 | Record a decision / 记录处理理由 | [Review notes and statuses](REVIEW_NOTES.md) |
 | Multiple dates / 多个日期 | [Timeline guide](MULTI_DATE.md) |
-| Short animation / 短动画 | [40-second introduction and earlier 78-second explainer](SHORT_DEMO.md) |
+| Short animation / 短动画 | [78-second explainer](SHORT_DEMO.md) |
 | Teacher exercise / 教学试用 | [Worksheet](teacher-review/WORKSHEET.zh-CN.md) · [AI-simulated review](teacher-review/REPORT.zh-CN.md) |
 | Simulated review / 模拟试用 | [Observed findings and fixes](SIMULATED-USABILITY-REVIEW.md) |
 | Simulated QA/QC roles / 模拟岗位试用 | [2026-10-04 task review](SIMULATED-ROLE-REVIEW-2026-10-04.md) |
