@@ -1,4 +1,14 @@
-# BatchScope in 78 seconds / 78 秒看懂 BatchScope
+# BatchScope videos / BatchScope 视频
+
+## New 40-second introduction / 新版 40 秒短动画
+
+[Watch the badger explain BatchScope / 看小獾讲解](demo/mascot/BatchScope-Mascot-Short-v0.6.0-alpha.5.mp4) · [English subtitles](demo/mascot/English.srt) · [中文字幕](demo/mascot/Chinese.srt)
+
+The picture-book scenes explain a fictional batch and audit event, then show a current capture of the desktop app. The badger and moving cards are illustrations, not app features. The English voice is locally synthesised. Flags are prompts for review, not compliance verdicts. / 绘本画面讲模拟批次与审计事件，穿插当前软件截图。小獾和卡片只是讲解动画；英文旁白为本机合成。标记是复核线索，不是合规结论。
+
+![Badger short-video poster](demo/mascot/poster.png)
+
+## Earlier 78-second version / 旧版 78 秒动画
 
 [Watch or download MP4 / 观看或下载](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [Video, voice and subtitles / 视频、旁白与字幕包](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Demo-Pack.zip)
 
