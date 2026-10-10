@@ -6,7 +6,7 @@ Review synthetic batch records and audit logs. Compare their changes across date
 
 [Windows download](https://github.com/rayexzh/batchscope/releases/tag/v0.6.0-alpha.5) · [78-second animation](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [Documentation](docs/INDEX.md)
 
-**Current version: v0.6.0-alpha.5.** A local desktop demonstration using synthetic data only.
+**Published Windows release: v0.6.0-alpha.5.** A local desktop demonstration using synthetic data only. The local source candidate is v0.6.0-alpha.6; see the [maintenance review](docs/REVIEW-2026-10-10.md) for changes and verification limits.
 
 ## What it is for
 

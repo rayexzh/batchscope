@@ -2,6 +2,8 @@
 
 Current release / 当前版本：[v0.6.0-alpha.5 truncated CSV checks / 截断 CSV 检查](RELEASE-v0.6.0-alpha.5.md).
 
+Local candidate / 本地候选版：[2026-10-10 maintenance review / 维护检查](REVIEW-2026-10-10.md).
+
 | Need / 需要 | Read / 入口 |
 |---|---|
 | First run / 第一次运行 | [Quick start](QUICKSTART.md) · [Windows build](WINDOWS_BUILD.md) |

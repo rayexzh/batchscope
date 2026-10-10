@@ -117,6 +117,8 @@ def review_audit(path, policy=None):
         input_rows = list(reader)
     except csv.Error as exc:
         raise ValueError('Cannot parse audit CSV: ' + str(exc)) from exc
+    if not input_rows:
+        raise ValueError('Audit CSV contains no event records. / 审计 CSV 没有事件记录。')
     events, findings, seen, previous = [], [], set(), {}
     for row_number, row in enumerate(input_rows, 2):
         if None in row or None in row.values():
@@ -130,9 +132,11 @@ def review_audit(path, policy=None):
                              'explanation_en': en, 'explanation_zh': zh})
         if any(not row[k].strip() for k in ('event_id','user_id','role','action','record_type','record_id')):
             flag('event.incomplete', 'input')
-        if row['event_id'] in seen:
+        event_id = row['event_id'].strip()
+        if event_id and event_id in seen:
             flag('event.duplicate', 'input')
-        seen.add(row['event_id'])
+        if event_id:
+            seen.add(event_id)
         action, role = row['action'].strip(), row['role'].strip()
         if action in ('update', 'delete', 'access_change') and not row['reason'].strip():
             flag('reason.missing')
@@ -148,17 +152,18 @@ def review_audit(path, policy=None):
         except (ValueError, OverflowError):
             flag('timestamp.invalid', 'input')
             continue
-        key = (row['record_type'], row['record_id'])
-        if key in previous and stamp < previous[key]:
+        key = (row['record_type'].strip(), row['record_id'].strip())
+        if all(key) and key in previous and stamp < previous[key]:
             flag('timestamp.order')
-        previous[key] = max(stamp, previous.get(key, stamp))
+        if all(key):
+            previous[key] = max(stamp, previous.get(key, stamp))
         if action in ('update','delete','access_change') and (
             stamp.weekday() not in policy['workdays'] or not policy['work_start'] <= stamp.hour < policy['work_end']
         ):
             flag('time.outside_hours', 'context')
     return {'events': events, 'findings': findings, 'policy': policy,
             'source': str(Path(path).resolve()), 'sha256': hashlib.sha256(raw).hexdigest(),
-            'ruleset': 'audit-review-0.1', 'reviewed_at': datetime.now(timezone.utc).isoformat(),
+            'ruleset': 'audit-review-0.2', 'reviewed_at': datetime.now(timezone.utc).isoformat(),
             'counts': dict(Counter(f['rule'] for f in findings)),
             'affected_events': len({f['source_row'] for f in findings})}
 

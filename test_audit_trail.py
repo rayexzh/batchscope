@@ -12,6 +12,44 @@ from audit_trail import FIELDS, POLICY, export_audit, generate_audit, inspect_au
 
 
 class AuditTests(unittest.TestCase):
+    def test_header_only_log_is_not_a_completed_review_and_keeps_previous_ui(self):
+        from app import Window
+        root = tk.Tk()
+        root.withdraw()
+        try:
+            view = Window(root).open_audit()
+            view.window.withdraw()
+            view.load(self.path)
+            original, original_path = view.result, view.path
+            empty = self.root / 'header-only.csv'
+            empty.write_text(','.join(FIELDS) + '\n', encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'no event records'):
+                view.load(empty)
+            self.assertIs(view.result, original)
+            self.assertEqual(view.path, original_path)
+            self.assertEqual(len(view.table.rows), 6)
+        finally:
+            root.destroy()
+
+    def test_identity_whitespace_does_not_hide_repeated_events_or_reversed_time(self):
+        events = review_audit(self.path)['events'][:2]
+        rows = [{k: e[k] for k in FIELDS} for e in events]
+        rows[1].update(event_id=' E001 ', record_type=' test_result ', record_id=' DEMO-T1 ',
+                       timestamp='2026-06-29T09:00:00Z', reason='Correction')
+        self.write(rows)
+        result = review_audit(self.path)
+        self.assertEqual(result['counts'], {'event.duplicate': 1, 'timestamp.order': 1})
+        self.assertEqual(result['events'][1]['event_id'], ' E001 ')
+
+    def test_blank_identity_does_not_link_unrelated_events(self):
+        events = review_audit(self.path)['events'][:2]
+        rows = [{k: e[k] for k in FIELDS} for e in events]
+        for row in rows:
+            row.update(event_id='', record_id='', reason='Correction')
+        rows[1]['timestamp'] = '2026-06-29T09:00:00Z'
+        self.write(rows)
+        self.assertEqual(review_audit(self.path)['counts'], {'event.incomplete': 2})
+
     def test_unterminated_quoted_record_is_rejected(self):
         row = {key: '' for key in FIELDS}
         row.update(event_id='E001', user_id='u1', role='analyst', action='update',

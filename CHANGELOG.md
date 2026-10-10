@@ -1,5 +1,12 @@
 # Change log / 更新日志
 
+## Unreleased / 尚未发布
+
+- Ignore surrounding whitespace when comparing event and record identities; preserve original imported values. Blank identifiers are flagged as incomplete and do not link unrelated events. / 比较事件与记录标识时忽略首尾空格，原值仍保留；空白标识提示不完整，不关联无关事件。
+- Reject header-only audit logs without replacing a previous desktop review. / 拒绝只有表头的空审计日志，保留上一份桌面复核结果。
+- Audit ruleset is now `audit-review-0.2`. Notes remain bound to their original ruleset and are not silently transferred to a changed review. / 审计规则集更新为 `audit-review-0.2`；旧备注仍绑定旧规则，不自动转移到新结果。
+- Existing Windows downloads do not yet contain these changes. / 现有 Windows 下载包尚未包含以上修改。
+
 ## v0.6.0-alpha.5 (2026-10-04) — Reject truncated CSV / 拒绝截断 CSV
 
 - Reject quoted fields cut off at end of audit logs or quality input files. / 审计日志与质量输入文件中的引号未闭合记录不再被误读。

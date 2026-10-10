@@ -6,7 +6,7 @@ Review synthetic batch records and audit logs. Compare their changes across date
 
 [下载 Windows 版](https://github.com/rayexzh/batchscope/releases/tag/v0.6.0-alpha.5) · [78 秒动画](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [文档目录](docs/INDEX.md)
 
-**当前版本：v0.6.0-alpha.5。** 本地桌面演示程序，仅使用模拟数据。
+**已发布 Windows 版：v0.6.0-alpha.5。** 本地桌面演示程序，仅使用模拟数据。本地源码候选版为 v0.6.0-alpha.6，修改内容与验证范围见[维护检查](docs/REVIEW-2026-10-10.md)。
 
 ## 解决什么问题
 

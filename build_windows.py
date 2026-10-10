@@ -1,4 +1,5 @@
 """Build a Windows x64 portable EXE and archive, using an isolated build environment."""
+import argparse
 import hashlib
 from importlib.metadata import distribution
 import json
@@ -13,12 +14,20 @@ from quality_ops import VERSION
 
 
 def main():
+    root = Path(__file__).resolve().parent
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--artifact-root', type=Path, default=root,
+                        help='Parent for build/ and dist/; choose a fresh folder to preserve earlier candidate builds')
+    artifact_root = parser.parse_args().artifact_root.resolve()
     if sys.platform != "win32":
         raise SystemExit("Build on Windows; PyInstaller does not cross-compile.")
     if struct.calcsize("P") != 8:
         raise SystemExit("Use 64-bit Python to build the Windows x64 package.")
-    root = Path(__file__).resolve().parent
-    build, dist = root / "build", root / "dist"
+    build, dist = artifact_root / "build", artifact_root / "dist"
+    package = build / f"BatchScope-{VERSION}-windows-x64"
+    archive = dist / f"BatchScope-{VERSION}-windows-x64.zip"
+    if package.exists() or archive.exists():
+        raise SystemExit('Versioned output already exists. Choose a fresh --artifact-root to preserve it.')
     args = [sys.executable,"-m","PyInstaller","--noconfirm","--clean","--onefile","--windowed",
             "--name","BatchScope","--distpath",str(dist),"--workpath",str(build / "pyinstaller"),
             "--specpath",str(build),"--add-data",f"{root / 'schema.sql'};.",
@@ -26,8 +35,7 @@ def main():
             "--add-data",f"{root / 'operations_sql'};operations_sql",str(root / "app.py")]
     subprocess.run(args, cwd=root, check=True)
     exe = dist / "BatchScope.exe"
-    package = build / f"BatchScope-{VERSION}-windows-x64"
-    package.mkdir(parents=True, exist_ok=True)
+    package.mkdir(parents=True)
     shutil.copyfile(exe, package / exe.name)
     for pattern in ("*.py","*.md","*.json","*.txt","*.sql","*.bat"):
         for p in root.glob(pattern):
@@ -47,7 +55,6 @@ def main():
         for entry in metadata.files or []:
             if ".dist-info/licenses/" in str(entry) and metadata.locate_file(entry).is_file():
                 shutil.copyfile(metadata.locate_file(entry), package / f"{dependency}_{entry.name}")
-    archive = dist / f"BatchScope-{VERSION}-windows-x64.zip"
     with zipfile.ZipFile(archive,"w",zipfile.ZIP_DEFLATED) as z:
         for p in sorted(package.rglob("*")):
             if p.is_file():

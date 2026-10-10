@@ -20,6 +20,8 @@ The `dist/` directory contains the EXE, portable ZIP, SHA-256 checksums and `BUI
 
 `dist/` 提供 EXE、便携 ZIP、校验文件与构建信息；生成物不进入源码仓库，二进制放在 GitHub Releases。
 
+An existing versioned package or ZIP blocks rebuilding in the same location. Use `python build_windows.py --artifact-root outputs/candidate-new` to build into a fresh parent; its `build/` and `dist/` preserve earlier candidates. / 已存在的版本目录或 ZIP 会阻止原地重打包；用新的 `--artifact-root` 保存新候选构建，保留之前产物。
+
 Bundled schema/SQL files are read-only resources. EXE output uses the user profile, not the temporary one-file extraction folder or the installation directory. The portable archive also includes source, fictional inputs, documentation and applicable runtime notices. The executable is not digitally signed.
 
 内置 SQL 与数据库结构只读；输出不依赖临时解压目录或安装目录。便携包附带源码、模拟输入、文档和运行时声明，EXE 未做数字签名。
