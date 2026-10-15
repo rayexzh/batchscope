@@ -48,6 +48,37 @@ def self_test(folder):
         root.withdraw()
         window = Window(root)
         window.create_data()
+        checker = window.open_inputcheck()
+        checker.window.withdraw()
+        checker.buttons['check'].invoke()
+        deadline = time.monotonic() + 60
+        while checker.busy and time.monotonic() < deadline:
+            root.update();time.sleep(.03)
+        if checker.busy or not checker.result or checker.result['counts']['error']:
+            raise AssertionError('Packaged input check did not accept generated data.')
+        if len(checker.result['profiles']) != 4 or checker.result['counts']['info'] != 14:
+            raise AssertionError('Packaged input check did not retain missing measurements.')
+        if window.result is not None:
+            raise AssertionError('Checking input files must not start the main analysis.')
+        from input_check_ui import export_check
+        export_check(checker.result, folder / 'input-check-export')
+        if not (folder / 'input-check-export/manifest.json').is_file():
+            raise AssertionError('Packaged input check export did not finish.')
+        from quality_ops import check_inputs, COLUMNS
+        import csv
+        bad_inputs = folder / 'bad-inputs'
+        bad_inputs.mkdir()
+        for source in inputs.iterdir():
+            if source.is_file():
+                (bad_inputs / source.name).write_bytes(source.read_bytes())
+        with (bad_inputs / 'test_results.csv').open(encoding='utf-8-sig', newline='') as handle:
+            rows = list(csv.reader(handle))
+        rows[1][COLUMNS['test_results'].index('value')] = '1_00'
+        with (bad_inputs / 'test_results.csv').open('w', encoding='utf-8-sig', newline='') as handle:
+            csv.writer(handle).writerows(rows)
+        bad_check = check_inputs(bad_inputs)
+        if bad_check['can_analyse'] or not any(r['row'] == 2 and r['value'] == '1_00' for r in bad_check['findings']):
+            raise AssertionError('Packaged numeric check silently accepted an underscore.')
         window.as_of.set("2026-06-30")
         window.start()
         deadline = time.monotonic() + 60
@@ -193,7 +224,10 @@ def self_test(folder):
                               "review note history at minimum window size",
                               "isolated laboratory comparison and unchanged baseline",
                               "three-attempt practice retaining initial result",
-                              "replayable laboratory exports and reset"],
+                              "replayable laboratory exports and reset",
+                              "input check before analysis and retained missing results",
+                              "ambiguous numeric input rejected with row evidence",
+                              "full bilingual input-check export and manifest"],
                     "metrics": result["metrics"], "operations_metrics":operations["metrics"],
                     "persistent_output_root":str(output_root())}
         (folder / "SELF_TEST.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2), encoding="utf-8")

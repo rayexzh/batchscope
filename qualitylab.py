@@ -5,13 +5,12 @@ from datetime import datetime, timezone
 import hashlib
 import html
 import json
-import math
 from pathlib import Path
 import sqlite3
 import tempfile
 
 from comparison import snapshot
-from quality_ops import COLUMNS, ROOT, VERSION, iso_date, write_csv
+from quality_ops import COLUMNS, ROOT, VERSION, iso_date, write_csv, finite_number
 
 EDITABLE = ('value', 'spec_low', 'spec_high', 'measured_on')
 SCOPE = ('Synthetic what-if experiment only. Both arms use the same as-of date. '
@@ -71,11 +70,9 @@ class Laboratory:
                     if isinstance(value, bool):
                         raise ValueError('Use a finite number / 请输入有限数值。')
                     try:
-                        value = float(value)
+                        value = finite_number(value)
                     except (TypeError, ValueError) as exc:
                         raise ValueError('Use a finite number / 请输入有限数值。') from exc
-                    if not math.isfinite(value):
-                        raise ValueError('Use a finite number / 请输入有限数值。')
             row[key] = value
         if row['spec_low'] > row['spec_high']:
             raise ValueError('Lower bound exceeds upper bound. / 下限不能高于上限。')

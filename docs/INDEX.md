@@ -2,10 +2,9 @@
 
 Current release / 当前版本：[v0.7.0-alpha.1 quality laboratory / 质量数据实验室](RELEASE-v0.7.0-alpha.1.md).
 
-Local candidate / 本地候选版：[2026-10-10 maintenance review / 维护检查](REVIEW-2026-10-10.md).
-
 | Need / 需要 | Read / 入口 |
 |---|---|
+| Check before analysis / 分析前检查 | [Input check / 输入预检](INPUT_CHECK.md) |
 | Try a synthetic change / 模拟试错 | [Quality data laboratory](LABORATORY.md) · [v0.7.0 notes](RELEASE-v0.7.0-alpha.1.md) |
 | First run / 第一次运行 | [Quick start](QUICKSTART.md) · [Windows build](WINDOWS_BUILD.md) |
 | Watch / 看视频 | [English demonstration](DEMO_VIDEO.md), recorded on v0.5.0-alpha.2 |

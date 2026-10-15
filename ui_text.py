@@ -1,5 +1,6 @@
 """Single-language desktop text; source data remains unchanged."""
 TEXT = {
+    'input_check': ('检查输入数据', 'Check input data'),
     'laboratory': ('质量数据实验室', 'Quality data laboratory'),
     "inputs_changed": ("输入或日期已变更，尚未重新分析；下方仍为上次快照。", "Inputs or dates changed; not analysed yet. The previous snapshot remains below."),
     "snapshot_input": ("快照对应输入：{folder}", "Snapshot input: {folder}"),

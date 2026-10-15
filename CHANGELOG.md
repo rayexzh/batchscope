@@ -1,5 +1,12 @@
 # Change log / 更新日志
 
+## v0.7.0-alpha.2 (2026-10-16) — Check input files / 输入预检
+
+- Check files before analysis. Show errors, missing measurements and matching-content records with row references; export the full findings. / 分析前检查文件，按行列出错误、空白检验值和内容相同的记录，可导出完整清单。
+- Reject ambiguous numeric text in imports and laboratory edits. Keep missing values and possible repeats unchanged. / 导入和实验室修改共用数值检查；保留空值和疑似重复，不猜数值、不自动删除。
+- Build the analysis database from the same captured bytes as its recorded input hashes. / 分析数据库与输入校验值使用同一份读取快照。
+- Shorten the Chinese and English project introductions. / 精简中英文介绍。
+
 ## v0.7.0-alpha.1 (2026-10-15) — Quality data laboratory / 质量数据实验室
 
 - Add an isolated quality data laboratory for synthetic result, bound and date changes, with same-date comparisons, reset and replayable exports. / 新增独立质量数据实验室，支持模拟检验值、范围、日期修改，同日对比、恢复与可重跑导出。

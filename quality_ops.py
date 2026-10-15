@@ -4,18 +4,20 @@ from __future__ import annotations
 import argparse
 import csv
 from contextlib import closing
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime, timezone
 import hashlib
+import io
 import json
 import math
 from pathlib import Path
 import random
+import re
 import sqlite3
 from runtime_paths import RESOURCE_ROOT
 from workbench import build_operations, export_operations
 
 ROOT = RESOURCE_ROOT
-VERSION = "0.7.0-alpha.1"
+VERSION = "0.7.0-alpha.2"
 COLUMNS = {
     "batches": "batch_id product manufactured_on".split(),
     "test_results": "test_id batch_id test_type method value unit spec_low spec_high spec_unit measured_on".split(),
@@ -25,6 +27,17 @@ COLUMNS = {
 DATE_FIELDS = {"manufactured_on", "measured_on", "opened_on", "closed_on", "created_on", "due_on", "completed_on"}
 OPTIONAL = {"value", "closed_on", "completed_on"}
 NUMBERS = {"value", "spec_low", "spec_high"}
+NUMBER_RE = re.compile(r'^[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?$')
+
+
+def finite_number(value):
+    """Decimal/exponent values only; never guess separators or strip units."""
+    if isinstance(value, bool) or not NUMBER_RE.fullmatch(str(value).strip()):
+        raise ValueError('Use a finite number without separators or unit text.')
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError('Use a finite number.')
+    return number
 
 
 def iso_date(value):
@@ -84,7 +97,7 @@ def generate(folder, seed=42, batches=100):
     return {table: len(rows) for table, rows in data.items()}
 
 
-def load_inputs(folder):
+def load_inputs(folder, contents=None):
     """Fail closed on structural/domain input errors; missing measurements are retained."""
     data, issues = {}, []
     def issue(table, row, field, reason):
@@ -93,7 +106,16 @@ def load_inputs(folder):
     for table, columns in COLUMNS.items():
         data[table] = []
         seen = set()
-        with (Path(folder) / f"{table}.csv").open(encoding="utf-8-sig", newline="") as handle:
+        try:
+            content = ((Path(folder) / f'{table}.csv').read_bytes() if contents is None
+                       else contents.get(f'{table}.csv'))
+            if content is None:
+                raise OSError('Missing or unreadable file')
+            text = content.decode('utf-8-sig')
+        except (OSError, UnicodeError):
+            issue(table, 1, 'file', 'File is missing, unreadable or not UTF-8.')
+            continue
+        with io.StringIO(text, newline='') as handle:
             reader = csv.DictReader(handle, strict=True)
             try:
                 found_headers = reader.fieldnames
@@ -120,12 +142,10 @@ def load_inputs(folder):
                         if key in DATE_FIELDS:
                             iso_date(value)
                         elif key in NUMBERS:
-                            number = float(value)
-                            if not math.isfinite(number):
-                                raise ValueError("Non-finite number.")
-                            clean[key] = number
+                            clean[key] = finite_number(value)
                     except ValueError:
-                        issue(table, line, key, "Invalid ISO date or finite numeric value.")
+                        issue(table, line, key, 'Use YYYY-MM-DD.' if key in DATE_FIELDS else
+                              'Use a finite number without separators or unit text.')
                 pk = clean[columns[0]]
                 if pk in seen:
                     issue(table, line, columns[0], "Duplicate primary key.")
@@ -163,20 +183,79 @@ def load_inputs(folder):
     return data, issues
 
 
+def check_inputs(folder):
+    """Read once and return findings plus the exact validated data for analysis."""
+    folder = Path(folder)
+    contents, findings = {}, []
+    for name in [f'{table}.csv' for table in COLUMNS] + ['SOURCE.json']:
+        try:
+            contents[name] = (folder / name).read_bytes()
+        except OSError:
+            pass  # The loader/marker check below records every unreadable file.
+    source_issue = None
+    try:
+        marker = json.loads(contents.get('SOURCE.json', b'').decode('utf-8-sig'))
+        if not isinstance(marker, dict) or marker.get('data_type') != 'synthetic':
+            source_issue = 'SOURCE.json must declare data_type as synthetic.'
+    except (UnicodeError, ValueError):
+        source_issue = 'SOURCE.json is missing, unreadable or invalid JSON.'
+    data, issues = load_inputs(folder, contents=contents)
+    if source_issue:
+        issues.insert(0, ['SOURCE.json', 1, 'data_type', source_issue])
+    by_row = {table: dict(rows) for table, rows in data.items()}
+    for table, row, field, reason in issues:
+        record = by_row.get(table, {}).get(row, {})
+        value = record.get(field)
+        findings.append({'table': table, 'row': row, 'field': field, 'level': 'error',
+                         'value': '' if value is None else str(value), 'reason': reason, 'related_row': None})
+    seen = {}
+    for number, row in data['test_results']:
+        if row['value'] is None:
+            findings.append({'table': 'test_results', 'row': number, 'field': 'value', 'level': 'info',
+                             'value': '', 'reason': 'Result is missing, not zero.', 'related_row': None})
+        key = tuple(row[column] for column in COLUMNS['test_results'][1:])
+        if key in seen and row['test_id'] != seen[key][1]:
+            findings.append({'table': 'test_results', 'row': number, 'field': 'test_id', 'level': 'warning',
+                             'value': row['test_id'], 'reason': 'Same measurement content under a different ID; check duplicate entry or planned repeat.',
+                             'related_row': seen[key][0]})
+        else:
+            seen.setdefault(key, (number, row['test_id']))
+    counts = {level: sum(row['level'] == level for row in findings) for level in ('error', 'warning', 'info')}
+    profiles = [{'table': table, 'readable_records': len(rows),
+                 'missing_results': sum(row['value'] is None for _, row in rows) if table == 'test_results' else None}
+                for table, rows in data.items()]
+    return {'source': str(folder.resolve()), 'input_sha256': {name: hashlib.sha256(content).hexdigest() for name, content in contents.items()},
+            'checked_at_utc': datetime.now(timezone.utc).isoformat(),
+            'can_analyse': not counts['error'], 'counts': counts, 'profiles': profiles, 'findings': findings,
+            'note': 'Checks describe captured bytes, not current live files. Warnings are review prompts; no data is corrected or deleted.',
+            '_data': data}
+
+
+def input_report(check):
+    return {key: value for key, value in check.items() if key != '_data'}
+
+
+def write_input_report(check, folder):
+    folder = Path(folder)
+    (folder / 'INPUT_CHECK.json').write_text(json.dumps(input_report(check), ensure_ascii=False, indent=2), encoding='utf-8')
+    columns = ['table', 'row', 'field', 'level', 'value', 'reason', 'related_row']
+    write_csv(folder / 'INPUT_FINDINGS.csv', columns, [[row[key] for key in columns] for row in check['findings']])
+
+
 def analyse(inputs, output, as_of):
     iso_date(as_of)
     inputs, output = Path(inputs), Path(output)
     if output.exists():
         raise ValueError("Output folder exists; choose a new folder to preserve previous runs.")
-    paths = [inputs / f"{t}.csv" for t in COLUMNS] + [inputs / "SOURCE.json"]
-    hashes = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
-    provenance = json.loads((inputs / "SOURCE.json").read_text(encoding="utf-8"))
-    if not isinstance(provenance, dict) or provenance.get("data_type") != "synthetic":
-        raise ValueError("This demonstration accepts explicitly labelled synthetic inputs only.")
-    data, issues = load_inputs(inputs)
-    if any(hashlib.sha256(p.read_bytes()).hexdigest() != hashes[p.name] for p in paths):
-        raise ValueError("Input changed during reading. Run again with stable files.")
+    checked = check_inputs(inputs)
+    data, hashes = checked['_data'], checked['input_sha256']
+    issues = [[row['table'], row['row'], row['field'], row['reason']]
+              for row in checked['findings'] if row['level'] == 'error']
+    marker_errors = [row for row in issues if row[0] == 'SOURCE.json']
+    if marker_errors:
+        raise ValueError(marker_errors[0][3])
     output.mkdir(parents=True)
+    write_input_report(checked, output)
     if issues:
         write_csv(output / "INPUT_ISSUES.csv", ["table", "row", "field", "reason"], issues)
         (output / "STOPPED.md").write_text("Input validation failed. No analysis produced. / 输入校验失败，未生成分析。\n", encoding="utf-8")

@@ -34,6 +34,9 @@ FILTERS = {
     "03_overdue_actions": ("overdue",),
 }
 FIELD_LABELS = {
+    'table': '文件 / File', 'row': '记录行号 / CSV row', 'field': '字段 / Field',
+    'reason': '问题说明 / Finding', 'related_row': '对应原记录行 / First matching row',
+    'readable_records': '已读入记录 / Readable records', 'missing_results': '空白检验值 / Missing results',
     'baseline_count': '原始情景 / Baseline', 'scenario_count': '假设情景 / Scenario',
     'attempt': '检验轮次 / Attempt',
     'baseline_value': '原始检验值 / Baseline value', 'scenario_value': '假设检验值 / Scenario value',
@@ -114,6 +117,8 @@ def clipboard_row(columns, row, language=None):
 def display_value(field, value, language=None):
     if value is None:
         return "—"
+    if field == 'level' and value in ('error', 'warning', 'info'):
+        return local_label({'error': '错误 / Error', 'warning': '需核对 / Review', 'info': '提示 / Note'}[value], language)
     if field == "review_status":
         from audit_notes import STATUSES
         label=STATUSES.get(value,(value,value))
