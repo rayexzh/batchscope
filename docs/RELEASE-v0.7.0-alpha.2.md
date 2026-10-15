@@ -13,3 +13,5 @@ Numeric fields no longer accept underscores, commas, formulas or unit text. The 
 The Windows ZIP includes `BatchScope.exe`; Python is not required. Validation records and SHA-256 checksums are attached to the release. Checks were run on the build machine, not a separate clean VM or an external user's computer. This is still a synthetic-data learning tool.
 
 Windows ZIP 内含 `BatchScope.exe`，无需安装 Python。验证记录及 SHA-256 校验值附在发布页面。测试在构建机器上进行，不是全新虚拟机或外部用户电脑验收；程序仍用于模拟数据学习。
+
+109 source tests passed locally. The built and ZIP-extracted EXE passed native diagnostics, including checks before analysis and full exports. / 本地 109 项源码测试通过，构建后及 ZIP 解压后的 EXE 通过原生诊断，涵盖分析前预检与完整导出。

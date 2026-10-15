@@ -1,6 +1,6 @@
 # BatchScope documentation / 文档导航
 
-Current release / 当前版本：[v0.7.0-alpha.1 quality laboratory / 质量数据实验室](RELEASE-v0.7.0-alpha.1.md).
+Current release / 当前版本：[v0.7.0-alpha.2 input checks / 输入预检](RELEASE-v0.7.0-alpha.2.md).
 
 | Need / 需要 | Read / 入口 |
 |---|---|
