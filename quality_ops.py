@@ -17,7 +17,7 @@ from runtime_paths import RESOURCE_ROOT
 from workbench import build_operations, export_operations
 
 ROOT = RESOURCE_ROOT
-VERSION = "0.7.0-alpha.2"
+VERSION = "0.7.0-alpha.3"
 COLUMNS = {
     "batches": "batch_id product manufactured_on".split(),
     "test_results": "test_id batch_id test_type method value unit spec_low spec_high spec_unit measured_on".split(),
@@ -28,6 +28,7 @@ DATE_FIELDS = {"manufactured_on", "measured_on", "opened_on", "closed_on", "crea
 OPTIONAL = {"value", "closed_on", "completed_on"}
 NUMBERS = {"value", "spec_low", "spec_high"}
 NUMBER_RE = re.compile(r'^[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?$')
+INPUT_FINDING_COLUMNS = ['table', 'row', 'field', 'level', 'value', 'reference_value', 'reason', 'related_row']
 
 
 def finite_number(value):
@@ -36,7 +37,10 @@ def finite_number(value):
         raise ValueError('Use a finite number without separators or unit text.')
     number = float(value)
     if not math.isfinite(number):
-        raise ValueError('Use a finite number.')
+        raise ValueError('Use a finite number without separators or unit text.')
+    # Inspect the decimal mantissa so even very long exponents cannot hide underflow.
+    if number == 0 and any(digit in '123456789' for digit in str(value).lower().split('e', 1)[0]):
+        raise ValueError('Non-zero value is too small to store; it would become zero.')
     return number
 
 
@@ -143,9 +147,9 @@ def load_inputs(folder, contents=None):
                             iso_date(value)
                         elif key in NUMBERS:
                             clean[key] = finite_number(value)
-                    except ValueError:
+                    except ValueError as exc:
                         issue(table, line, key, 'Use YYYY-MM-DD.' if key in DATE_FIELDS else
-                              'Use a finite number without separators or unit text.')
+                              str(exc))
                 pk = clean[columns[0]]
                 if pk in seen:
                     issue(table, line, columns[0], "Duplicate primary key.")
@@ -181,6 +185,34 @@ def load_inputs(folder, contents=None):
                 if row["spec_low"] > row["spec_high"]:
                     issue(table, line, "spec_low", "Lower specification exceeds upper specification.")
     return data, issues
+
+
+def range_findings(data):
+    """Compare like measurements, without treating any observed range as approved."""
+    products = {row['batch_id']: row['product'] for _, row in data['batches']}
+    groups = {}
+    for number, row in data['test_results']:
+        key = (products[row['batch_id']], row['test_type'], row['method'], row['unit'], row['spec_unit'])
+        groups.setdefault(key, []).append((number, row))
+    findings = []
+    for rows in groups.values():
+        representatives = {}
+        for number, row in rows:
+            representatives.setdefault((row['spec_low'], row['spec_high']), number)
+        if len(representatives) < 2:
+            continue
+        first, second = list(representatives)[:2]
+        for number, row in rows:
+            own_range = (row['spec_low'], row['spec_high'])
+            other_range = second if own_range == first else first
+            findings.append({
+                'table': 'test_results', 'row': number, 'field': 'spec_low/spec_high', 'level': 'warning',
+                'value': str(own_range[0]) + ' .. ' + str(own_range[1]),
+                'reference_value': str(other_range[0]) + ' .. ' + str(other_range[1]),
+                'reason': 'Different ranges occur for the same product, test, method and unit; check which specification applies.',
+                'related_row': representatives[other_range],
+            })
+    return findings
 
 
 def check_inputs(folder):
@@ -220,6 +252,10 @@ def check_inputs(folder):
                              'related_row': seen[key][0]})
         else:
             seen.setdefault(key, (number, row['test_id']))
+    if not issues:
+        findings.extend(range_findings(data))
+    for finding in findings:
+        finding.setdefault('reference_value', '')
     counts = {level: sum(row['level'] == level for row in findings) for level in ('error', 'warning', 'info')}
     profiles = [{'table': table, 'readable_records': len(rows),
                  'missing_results': sum(row['value'] is None for _, row in rows) if table == 'test_results' else None}
@@ -238,7 +274,7 @@ def input_report(check):
 def write_input_report(check, folder):
     folder = Path(folder)
     (folder / 'INPUT_CHECK.json').write_text(json.dumps(input_report(check), ensure_ascii=False, indent=2), encoding='utf-8')
-    columns = ['table', 'row', 'field', 'level', 'value', 'reason', 'related_row']
+    columns = INPUT_FINDING_COLUMNS
     write_csv(folder / 'INPUT_FINDINGS.csv', columns, [[row[key] for key in columns] for row in check['findings']])
 
 

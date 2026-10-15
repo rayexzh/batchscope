@@ -24,6 +24,10 @@ All inputs are synthetic. CSV headers must match the listed names and order; enc
 
 Source metadata: `SOURCE.json` must be a JSON object with `data_type: synthetic`. The supplied generator also records its version, seed, batch count and fixed date origin. All four CSVs and this metadata file receive input SHA-256 hashes in the analysis manifest.
 
+Numbers are stored as binary floating-point values, not arbitrary-precision decimals. A non-zero input that would become zero is rejected. / 数值按二进制浮点数存储，不提供任意小数精度；非零输入若会变成零，则拒绝读入。
+
+Input checks also flag mixed ranges within the same product/test/method/unit group. Every affected record is retained, with a comparison range and related row. The comparison is not an approved specification; versions must be checked separately. / 预检也会提示同产品、项目、方法、单位下的范围差异，保留全部记录及对照范围、行号；对照范围不是批准规格，适用版本仍需另行核对。
+
 ## Metric definitions / 指标定义
 
 - `outside_range_pct`: 100 × outside-range records ÷ judgeable records, separately for each product/test/method/unit/bounds group. No judgeable records means NULL, not 0%.

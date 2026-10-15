@@ -73,12 +73,27 @@ def self_test(folder):
                 (bad_inputs / source.name).write_bytes(source.read_bytes())
         with (bad_inputs / 'test_results.csv').open(encoding='utf-8-sig', newline='') as handle:
             rows = list(csv.reader(handle))
-        rows[1][COLUMNS['test_results'].index('value')] = '1_00'
+        value_column = COLUMNS['test_results'].index('value')
+        original_numeric = rows[1][value_column]
+        rows[1][value_column] = '1_00'
         with (bad_inputs / 'test_results.csv').open('w', encoding='utf-8-sig', newline='') as handle:
             csv.writer(handle).writerows(rows)
         bad_check = check_inputs(bad_inputs)
         if bad_check['can_analyse'] or not any(r['row'] == 2 and r['value'] == '1_00' for r in bad_check['findings']):
             raise AssertionError('Packaged numeric check silently accepted an underscore.')
+        rows[1][value_column] = '1e-999'
+        with (bad_inputs / 'test_results.csv').open('w', encoding='utf-8-sig', newline='') as handle:
+            csv.writer(handle).writerows(rows)
+        if check_inputs(bad_inputs)['can_analyse']:
+            raise AssertionError('Packaged numeric check silently accepted non-zero underflow.')
+        rows[1][value_column] = original_numeric
+        rows[1][COLUMNS['test_results'].index('spec_low')] = '94'
+        with (bad_inputs / 'test_results.csv').open('w', encoding='utf-8-sig', newline='') as handle:
+            csv.writer(handle).writerows(rows)
+        mixed_check = check_inputs(bad_inputs)
+        mixed = [r for r in mixed_check['findings'] if r['field'] == 'spec_low/spec_high']
+        if not mixed_check['can_analyse'] or not mixed or not all(r['reference_value'] for r in mixed):
+            raise AssertionError('Packaged range review lost comparison evidence or blocked valid data.')
         window.as_of.set("2026-06-30")
         window.start()
         deadline = time.monotonic() + 60
@@ -194,6 +209,12 @@ def self_test(folder):
         if not (folder/'laboratory-export/manifest.json').is_file():
             raise AssertionError('Packaged laboratory export did not complete.')
         laboratory.reset()
+        laboratory.fields['value'].set('0')
+        laboratory.stage()
+        laboratory.fields['value'].set('1e-999')
+        if not laboratory.draft_dirty() or not laboratory.buttons['export'].instate(['disabled']):
+            raise AssertionError('Packaged laboratory treated an underflow draft as unchanged zero.')
+        laboratory.reset()
         fixed_id = batch.result["batch"]["batch_id"]
         window.toggle_language()
         window.toggle_theme()
@@ -227,7 +248,9 @@ def self_test(folder):
                               "replayable laboratory exports and reset",
                               "input check before analysis and retained missing results",
                               "ambiguous numeric input rejected with row evidence",
-                              "full bilingual input-check export and manifest"],
+                              "full bilingual input-check export and manifest",
+                              "non-zero underflow blocked in input files and drafts",
+                              "mixed ranges retained with row and comparison evidence"],
                     "metrics": result["metrics"], "operations_metrics":operations["metrics"],
                     "persistent_output_root":str(output_root())}
         (folder / "SELF_TEST.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2), encoding="utf-8")

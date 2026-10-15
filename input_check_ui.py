@@ -10,7 +10,7 @@ import threading
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
-from quality_ops import check_inputs, input_report, write_input_report
+from quality_ops import check_inputs, input_report, write_input_report, INPUT_FINDING_COLUMNS
 
 TEXT = {
     'title': ('检查输入数据', 'Check input data'),
@@ -41,6 +41,8 @@ REASONS_ZH = {
     'Required value missing.': '必填值为空。',
     'Use YYYY-MM-DD.': '日期须为有效的 YYYY-MM-DD。',
     'Use a finite number without separators or unit text.': '请填写有限数值，如 100 或 98.5；不要加入分隔符或单位。',
+    'Non-zero value is too small to store; it would become zero.': '这个非零数太小，存储时会变成零；已停止读入，请核对数值。',
+    'Different ranges occur for the same product, test, method and unit; check which specification applies.': '同一产品、项目、方法和单位下出现不同范围；请核对适用的规格。对照值不是批准值，两条记录均保留。',
     'Duplicate primary key.': '记录编号重复。',
     'At least one batch is required.': '至少需要一条批次记录。',
     'Action predates deviation opening.': '措施创建日期早于偏差开启日期。',
@@ -71,7 +73,7 @@ def export_check(result, destination):
     for lang, locale in (('en', 'en'), ('zh', 'zh-CN')):
         title = TEXT['title'][lang == 'en']
         body = f'<!doctype html><html lang="{locale}"><meta charset="utf-8"><title>{title}</title><style>body{{font:16px system-ui;max-width:1100px;margin:32px auto;padding:16px}}table{{border-collapse:collapse;width:100%}}td,th{{border:1px solid #ccd8d2;padding:8px;text-align:left}}p{{overflow-wrap:anywhere}}</style><h1>{title}</h1><p>{html.escape(result["source"])}</p><p>{html.escape(result["checked_at_utc"])}</p><p>{TEXT["scope"][lang == "en"]}</p>'
-        columns = ['table', 'row', 'field', 'level', 'value', 'reason', 'related_row']
+        columns = INPUT_FINDING_COLUMNS
         body += '<table><tr>' + ''.join('<th>' + html.escape(field_label(key, lang)) + '</th>' for key in columns) + '</tr>'
         for row in result['findings']:
             body += '<tr>' + ''.join('<td>' + html.escape(reason_text(row[key], lang) if key == 'reason'
@@ -125,7 +127,7 @@ class InputCheckWindow:
         self.notebook.add(findings)
         self.notebook.add(files)
         self.finding_table = factory(findings, owner, self.open_finding)
-        self.finding_table.priority = ['table', 'row', 'field', 'level', 'value', 'reason', 'related_row']
+        self.finding_table.priority = INPUT_FINDING_COLUMNS
         self.finding_table.tree.configure(height=6)
         self.profile_table = factory(files, owner)
         self.profile_table.priority = ['table', 'readable_records', 'missing_results']

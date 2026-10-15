@@ -19,6 +19,8 @@ The laboratory also has a two-/three-attempt exercise. Every result stays visibl
 
 The app runs locally. It has Chinese and English interfaces, search, date comparisons and report exports. Missing results stay missing. Possible duplicates are listed for review and are not deleted.
 
+If comparable tests use different ranges, the check lists both for review. It does not choose a specification for you.
+
 ## Run from source
 
 Python 3.10+ with Tkinter:

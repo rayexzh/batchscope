@@ -9,6 +9,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
 from qualitylab import EDITABLE, Laboratory
+from quality_ops import finite_number
 
 TEXT = {
     'scope': ('模拟实验，不改原始数据；假设范围不代表获批规格，不用于批次放行。', 'Synthetic experiments; source data stays unchanged. Hypothetical limits are not approved specifications or release criteria.'),
@@ -211,7 +212,7 @@ class LaboratoryWindow:
                     return True
             else:
                 try:
-                    value = None if not text and key == 'value' else float(text)
+                    value = None if not text and key == 'value' else finite_number(text)
                 except ValueError:
                     return True
                 if value != current[key]:

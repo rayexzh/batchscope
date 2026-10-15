@@ -1,6 +1,6 @@
 # BatchScope documentation / 文档导航
 
-Current release / 当前版本：[v0.7.0-alpha.2 input checks / 输入预检](RELEASE-v0.7.0-alpha.2.md).
+Windows download / 下载：[Releases / 发布页面](https://github.com/rayexzh/batchscope/releases). [Recent changes / 最近更新](../CHANGELOG.md).
 
 | Need / 需要 | Read / 入口 |
 |---|---|

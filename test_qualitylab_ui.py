@@ -192,6 +192,31 @@ class LaboratoryUiTests(unittest.TestCase):
         self.assertLessEqual(view.repeat_table.tree.winfo_rooty() + view.repeat_table.tree.winfo_height(),
                              view.canvas.winfo_rooty() + view.canvas.winfo_height())
 
+    def test_ambiguous_and_underflow_drafts_cannot_export_a_previous_result(self):
+        view = self.view
+        self.run_comparison()
+        previous = view.result
+        view.fields['value'].set('9_0')
+        self.assertTrue(view.draft_dirty())
+        self.assertTrue(view.buttons['export'].instate(['disabled']))
+        with patch('qualitylab_ui.messagebox.showerror') as error:
+            view.stage()
+            error.assert_called_once()
+        self.assertIs(view.result, previous)
+        view.fields['value'].set('0')
+        view.stage()
+        self.run_comparison()
+        zero_result = view.result
+        view.fields['value'].set('1e-999')
+        self.assertTrue(view.draft_dirty())
+        self.assertTrue(view.buttons['run'].instate(['disabled']))
+        self.assertTrue(view.buttons['export'].instate(['disabled']))
+        with patch('qualitylab_ui.messagebox.showerror') as error:
+            view.stage()
+            self.assertIn('would become zero', error.call_args.args[1])
+        self.assertEqual(view.model.current('T1')['value'], 0)
+        self.assertIs(view.result, zero_result)
+
 
 if __name__ == '__main__':
     unittest.main()

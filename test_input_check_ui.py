@@ -1,5 +1,6 @@
 """Run preflight through the native controls, including failure and small-window flows."""
 import gc
+import csv
 import json
 from pathlib import Path
 import tempfile
@@ -142,6 +143,27 @@ class InputCheckUiTests(unittest.TestCase):
                           if isinstance(widget, tk.Text))
         self.assertIn('检验结果为空', content)
         detail.destroy()
+
+    def test_mixed_ranges_show_both_values_and_translate_the_warning(self):
+        path = self.inputs / 'test_results.csv'
+        with path.open(encoding='utf-8-sig', newline='') as handle:
+            rows = list(csv.reader(handle))
+        rows[2][6] = '85'
+        with path.open('w', encoding='utf-8-sig', newline='') as handle:
+            csv.writer(handle).writerows(rows)
+        self.run_check()
+        self.view.search.set('规格')
+        self.assertEqual(len(self.view.finding_table.rows), 3)
+        self.view.finding_table.tree.selection_set('0')
+        detail = self.view.finding_table.open_row()
+        content = ''.join(widget.get('1.0', 'end') for widget in detail.winfo_children()[0].winfo_children()
+                          if isinstance(widget, tk.Text))
+        self.assertIn('非批准值', content)
+        self.assertIn('85.0 .. 105.0', content)
+        detail.destroy()
+        self.app.toggle_language()
+        self.view.search.set('specification')
+        self.assertEqual(len(self.view.finding_table.rows), 3)
 
 
 if __name__ == '__main__':

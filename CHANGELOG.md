@@ -1,5 +1,11 @@
 # Change log / 更新日志
 
+## v0.7.0-alpha.3 (2026-10-16) — Compare ranges / 范围核对
+
+- Flag different ranges for like measurements, including across batches. Retain each record and show a comparison value and row; no range is labelled approved. / 提示同类检验的范围差异，保留每条记录，列出对照值和行号，不指定批准规格。
+- Reject non-zero values that would be stored as zero, in both measurements and limits. / 检验值和上下限中的非零数若会被存为零，停止读入。
+- Use the same strict parser when deciding whether a laboratory form is unchanged. Invalid drafts cannot export a previous result. / 实验室判断表单是否改动时共用严格规则；错误输入不能导出旧结果。
+
 ## v0.7.0-alpha.2 (2026-10-16) — Check input files / 输入预检
 
 - Check files before analysis. Show errors, missing measurements and matching-content records with row references; export the full findings. / 分析前检查文件，按行列出错误、空白检验值和内容相同的记录，可导出完整清单。

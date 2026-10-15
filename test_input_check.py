@@ -31,6 +31,15 @@ class InputCheckTests(unittest.TestCase):
         with path.open('w', encoding='utf-8-sig', newline='') as handle:
             csv.writer(handle).writerows(rows)
 
+    def test_supplied_example_has_two_review_prompts_without_changing_analysis(self):
+        inputs = Path(__file__).parent / 'examples/range-differences'
+        checked = check_inputs(inputs)
+        self.assertEqual(checked['counts'], {'error': 0, 'warning': 2, 'info': 0})
+        self.assertTrue(checked['can_analyse'])
+        result = analyse(inputs, self.root / 'supplied-example', '2026-06-30')
+        self.assertEqual(result['metrics']['measured_records'], 3)
+        self.assertEqual(result['metrics']['outside_range_records'], 0)
+
     def test_read_only_check_retains_missing_and_future_records(self):
         before = {p.name: p.read_bytes() for p in self.inputs.iterdir()}
         result = check_inputs(self.inputs)
@@ -136,6 +145,97 @@ class InputCheckTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             analyse(self.inputs, self.root / 'real', '2026-06-30')
         self.assertFalse((self.root / 'real').exists())
+
+    def test_nonzero_underflow_stops_import_and_laboratory_without_becoming_zero(self):
+        model = Laboratory(self.root / 'analysis/quality.sqlite', '2026-06-30',
+                           self.baseline['artifact_sha256']['quality.sqlite'])
+        for value in ('1e-999', '-1e-999', '1e-9999999999999999999999999999999999'):
+            with self.subTest(value=value):
+                self.rewrite_tests(lambda rows: rows[1].__setitem__(4, value))
+                result = check_inputs(self.inputs)
+                self.assertFalse(result['can_analyse'])
+                error = next(r for r in result['findings'] if r['level'] == 'error')
+                self.assertEqual(error['value'], value)
+                self.assertIn('would become zero', error['reason'])
+                with self.assertRaisesRegex(ValueError, 'would become zero'):
+                    model.stage('T1', {'value': value})
+                self.assertEqual(model.changes, {})
+        for value in ('0', '-0.0', '0e-9999999999999999999999999999999999'):
+            self.assertEqual(finite_number(value), 0)
+        self.assertGreater(finite_number('5e-324'), 0)
+
+    def test_zero_result_cannot_pass_a_lower_bound_that_underflows_to_zero(self):
+        def change(rows):
+            rows[1][4], rows[1][6] = '0', '1e-999'
+        self.rewrite_tests(change)
+        result = check_inputs(self.inputs)
+        self.assertFalse(result['can_analyse'])
+        found = [r for r in result['findings'] if r['level'] == 'error']
+        self.assertEqual([(r['row'], r['field'], r['value']) for r in found], [(2, 'spec_low', '1e-999')])
+        with self.assertRaises(ValueError):
+            analyse(self.inputs, self.root / 'underflow-bound', '2026-06-30')
+        self.assertFalse((self.root / 'underflow-bound/quality.sqlite').exists())
+
+    def test_different_ranges_flag_both_sides_without_choosing_an_approved_one(self):
+        self.rewrite_tests(lambda rows: rows[2].__setitem__(6, '85'))
+        before = (self.inputs / 'test_results.csv').read_bytes()
+        result = check_inputs(self.inputs)
+        found = [r for r in result['findings'] if r['field'] == 'spec_low/spec_high']
+        self.assertTrue(result['can_analyse'])
+        self.assertEqual({r['row'] for r in found}, {2, 3, 4})
+        self.assertEqual({(r['row'], r['related_row']) for r in found}, {(2, 3), (3, 2), (4, 3)})
+        self.assertEqual(found[0]['value'], '95.0 .. 105.0')
+        self.assertEqual(found[0]['reference_value'], '85.0 .. 105.0')
+        final = analyse(self.inputs, self.root / 'different-ranges', '2026-06-30')
+        self.assertEqual(final['metrics'], self.baseline['metrics'])
+        self.assertEqual((self.inputs / 'test_results.csv').read_bytes(), before)
+        exported = export_check(input_report(result), self.root / 'ranges-export')
+        with (exported / 'INPUT_FINDINGS.csv').open(encoding='utf-8-sig', newline='') as handle:
+            rows = list(csv.DictReader(handle))
+        comparisons = [r for r in rows if r['field'] == 'spec_low/spec_high']
+        self.assertEqual(len(comparisons), 3)
+        self.assertTrue(all(r['reference_value'] for r in comparisons))
+        body = (exported / 'INPUT_CHECK.en.html').read_text(encoding='utf-8')
+        self.assertIn('not approved', body)
+        self.assertIn('85.0 .. 105.0', body)
+
+    def test_range_comparisons_never_mix_different_methods_tests_units_or_products(self):
+        for field, replacement in ((2, 'purity'), (3, 'another-method'), (5, 'mg')):
+            with self.subTest(field=field):
+                original = (self.inputs / 'test_results.csv').read_bytes()
+                def change(rows):
+                    rows[2][6] = '85'
+                    rows[2][field] = replacement
+                    if field == 5:
+                        rows[2][8] = replacement
+                self.rewrite_tests(change)
+                result = check_inputs(self.inputs)
+                self.assertTrue(result['can_analyse'])
+                self.assertFalse(any(r['field'] == 'spec_low/spec_high' for r in result['findings']))
+                (self.inputs / 'test_results.csv').write_bytes(original)
+        batch_path = self.inputs / 'batches.csv'
+        with batch_path.open('a', encoding='utf-8', newline='') as handle:
+            csv.writer(handle).writerow(['B2', 'Different product', '2026-01-01'])
+        def different_product(rows):
+            rows[2][1], rows[2][6] = 'B2', '85'
+        self.rewrite_tests(different_product)
+        self.assertFalse(any(r['field'] == 'spec_low/spec_high' for r in check_inputs(self.inputs)['findings']))
+        batch_path.write_text(batch_path.read_text(encoding='utf-8-sig').replace('Different product', 'Demo tablet'),
+                              encoding='utf-8-sig')
+        self.assertEqual(sum(r['field'] == 'spec_low/spec_high' for r in check_inputs(self.inputs)['findings']), 3)
+
+    def test_range_comparison_is_symmetric_with_three_ranges_and_skips_invalid_inputs(self):
+        def three_ranges(rows):
+            rows[2][6], rows[3][6] = '85', '75'
+        self.rewrite_tests(three_ranges)
+        result = check_inputs(self.inputs)
+        found = [r for r in result['findings'] if r['field'] == 'spec_low/spec_high']
+        self.assertEqual(len(found), 3)
+        self.assertTrue(all(r['value'] != r['reference_value'] for r in found))
+        self.rewrite_tests(lambda rows: rows[1].__setitem__(4, 'not a number'))
+        result = check_inputs(self.inputs)
+        self.assertFalse(result['can_analyse'])
+        self.assertFalse(any(r['field'] == 'spec_low/spec_high' for r in result['findings']))
 
     def test_export_escapes_text_preserves_all_findings_and_refuses_overwrite(self):
         self.rewrite_tests(lambda rows: rows[1].__setitem__(4, '<script>alert(1)</script>'))

@@ -72,7 +72,7 @@ class Laboratory:
                     try:
                         value = finite_number(value)
                     except (TypeError, ValueError) as exc:
-                        raise ValueError('Use a finite number / 请输入有限数值。') from exc
+                        raise ValueError(str(exc) + ' / 请检查数值格式及可表示的范围。') from exc
             row[key] = value
         if row['spec_low'] > row['spec_high']:
             raise ValueError('Lower bound exceeds upper bound. / 下限不能高于上限。')

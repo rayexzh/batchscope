@@ -35,7 +35,8 @@ FILTERS = {
 }
 FIELD_LABELS = {
     'table': '文件 / File', 'row': '记录行号 / CSV row', 'field': '字段 / Field',
-    'reason': '问题说明 / Finding', 'related_row': '对应原记录行 / First matching row',
+    'reason': '问题说明 / Finding', 'related_row': '对照记录行 / Related CSV row',
+    'reference_value': '对照值（非批准值） / Comparison value (not approved)',
     'readable_records': '已读入记录 / Readable records', 'missing_results': '空白检验值 / Missing results',
     'baseline_count': '原始情景 / Baseline', 'scenario_count': '假设情景 / Scenario',
     'attempt': '检验轮次 / Attempt',

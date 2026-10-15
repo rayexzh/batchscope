@@ -1,0 +1,4 @@
+test_id,batch_id,test_type,method,value,unit,spec_low,spec_high,spec_unit,measured_on
+T-RANGE-A,B-DEMO-A,assay,demo-HPLC,100,%,95,105,%,2026-06-02
+T-RANGE-B,B-DEMO-B,assay,demo-HPLC,100,%,98,102,%,2026-06-02
+T-INDEPENDENT,B-DEMO-A,purity,demo-HPLC,99,%,98,100,%,2026-06-02
