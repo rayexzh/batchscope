@@ -1,6 +1,6 @@
 # Change log / 更新日志
 
-## Unreleased / 尚未发布
+## v0.7.0-alpha.1 (2026-10-15) — Quality data laboratory / 质量数据实验室
 
 - Add an isolated quality data laboratory for synthetic result, bound and date changes, with same-date comparisons, reset and replayable exports. / 新增独立质量数据实验室，支持模拟检验值、范围、日期修改，同日对比、恢复与可重跑导出。
 - Add two-/three-attempt teaching exercises. Keep all results and the initial outside-range flag; never average results into a release decision. / 新增二次、三次检验练习，保留全部结果及初始超范围提示，不通过平均结果生成放行结论。
@@ -8,7 +8,7 @@
 - Ignore surrounding whitespace when comparing event and record identities; preserve original imported values. Blank identifiers are flagged as incomplete and do not link unrelated events. / 比较事件与记录标识时忽略首尾空格，原值仍保留；空白标识提示不完整，不关联无关事件。
 - Reject header-only audit logs without replacing a previous desktop review. / 拒绝只有表头的空审计日志，保留上一份桌面复核结果。
 - Audit ruleset is now `audit-review-0.2`. Notes remain bound to their original ruleset and are not silently transferred to a changed review. / 审计规则集更新为 `audit-review-0.2`；旧备注仍绑定旧规则，不自动转移到新结果。
-- Existing Windows downloads do not yet contain these changes. / 现有 Windows 下载包尚未包含以上修改。
+- Windows package includes these changes; 95 source tests and built/extracted EXE diagnostics passed. / Windows 包包含以上修改；95 项源码测试及构建后、解压后 EXE 诊断通过。
 
 ## v0.6.0-alpha.5 (2026-10-04) — Reject truncated CSV / 拒绝截断 CSV
 

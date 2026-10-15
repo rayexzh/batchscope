@@ -4,9 +4,9 @@
 
 Review synthetic batch records and audit logs. Compare their changes across dates. [Full English README](README.md)
 
-[下载 Windows 版](https://github.com/rayexzh/batchscope/releases/tag/v0.6.0-alpha.5) · [78 秒动画](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [文档目录](docs/INDEX.md)
+[下载 Windows 版](https://github.com/rayexzh/batchscope/releases/tag/v0.7.0-alpha.1) · [78 秒动画](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [文档目录](docs/INDEX.md)
 
-**已发布 Windows 版：v0.6.0-alpha.5。** 本地桌面演示程序，仅使用模拟数据。源码候选版为 v0.7.0-alpha.1，新增[质量数据实验室](docs/LABORATORY.md)，并包含上轮[维护修复](docs/REVIEW-2026-10-10.md)。
+**已发布 Windows 版：v0.7.0-alpha.1。** 本地桌面演示程序，仅使用模拟数据。新增[质量数据实验室](docs/LABORATORY.md)，并包含上轮[维护修复](docs/REVIEW-2026-10-10.md)。
 
 ## 解决什么问题
 
@@ -41,7 +41,7 @@ BatchScope 把这些记录关联起来，按指定的**截至日期**还原当�
 4. 打开一条记录，追溯到对应批次。
 5. 打开 **多日期对比**，比较几个日期；原有两日期对比也保留。
 6. 打开 **审计日志复核**，生成模拟日志，查看一条检查结果。
-7. 源码候选版中，完成分析后可打开 **质量数据实验室**，试改模拟记录或练习二次、三次检验。[步骤与范围](docs/LABORATORY.md)。
+7. 完成分析后可打开 **质量数据实验室**，试改模拟记录或练习二次、三次检验。[步骤与范围](docs/LABORATORY.md)。
 
 默认示例的结果：
 

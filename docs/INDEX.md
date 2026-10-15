@@ -1,6 +1,6 @@
 # BatchScope documentation / 文档导航
 
-Current release / 当前版本：[v0.6.0-alpha.5 truncated CSV checks / 截断 CSV 检查](RELEASE-v0.6.0-alpha.5.md).
+Current release / 当前版本：[v0.7.0-alpha.1 quality laboratory / 质量数据实验室](RELEASE-v0.7.0-alpha.1.md).
 
 Local candidate / 本地候选版：[2026-10-10 maintenance review / 维护检查](REVIEW-2026-10-10.md).
 

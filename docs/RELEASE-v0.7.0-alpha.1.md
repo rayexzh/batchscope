@@ -13,3 +13,7 @@ Two- and three-attempt practice retains the original result and every later atte
 The laboratory uses the existing SQL rules on an isolated captured snapshot. Source CSVs, the completed database and main-window results stay unchanged. Scenario and repeat-exercise exports can be replayed and include a completion manifest.
 
 实验室在独立快照上复用原有 SQL 规则；源 CSV、已完成数据库及主界面结果不变。情景及重复练习导出保留完整记录与完成清单。
+
+95 source tests passed locally and in [GitHub Actions for the feature commit](https://github.com/rayexzh/batchscope/actions/runs/38762261823). The built and ZIP-extracted EXE passed native diagnostics including the laboratory, three retained attempts, reset and export. Testing used the build machine, not an independent clean VM or external user acceptance. The release includes checksums and validation JSON.
+
+95 项源码测试在本地及上述 GitHub Actions 通过；EXE 在构建后及 ZIP 解压后，完成实验室、三轮记录保留、恢复与导出诊断。验证范围为构建机器，不是独立全新虚拟机或外部用户验收。发布附件包含校验值及验证 JSON。
