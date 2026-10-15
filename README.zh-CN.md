@@ -6,7 +6,7 @@ Review synthetic batch records and audit logs. Compare their changes across date
 
 [下载 Windows 版](https://github.com/rayexzh/batchscope/releases/tag/v0.6.0-alpha.5) · [78 秒动画](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [文档目录](docs/INDEX.md)
 
-**已发布 Windows 版：v0.6.0-alpha.5。** 本地桌面演示程序，仅使用模拟数据。本地源码候选版为 v0.6.0-alpha.6，修改内容与验证范围见[维护检查](docs/REVIEW-2026-10-10.md)。
+**已发布 Windows 版：v0.6.0-alpha.5。** 本地桌面演示程序，仅使用模拟数据。源码候选版为 v0.7.0-alpha.1，新增[质量数据实验室](docs/LABORATORY.md)，并包含上轮[维护修复](docs/REVIEW-2026-10-10.md)。
 
 ## 解决什么问题
 
@@ -25,6 +25,7 @@ BatchScope 把这些记录关联起来，按指定的**截至日期**还原当�
 | **措施跟进** | 哪些未完成措施已逾期？对应什么批次和偏差？ |
 | **日期对比** | 2–12 个日期的数量怎样变化？相邻日期之间哪些记录发生变化？ |
 | **审计日志复核** | 哪些操作缺少原因、不符合配置权限，或存在时间异常？ |
+| **质量数据实验室** | 修改模拟检验值、范围或日期后，指标怎样变化？二次、三次检验的每轮结果有什么区别？ |
 
 打开记录后，可以沿关联查看批次、检验、偏差和措施。表格支持搜索、排序和复制；界面支持中英文切换、主题和字号调整。
 
@@ -40,6 +41,7 @@ BatchScope 把这些记录关联起来，按指定的**截至日期**还原当�
 4. 打开一条记录，追溯到对应批次。
 5. 打开 **多日期对比**，比较几个日期；原有两日期对比也保留。
 6. 打开 **审计日志复核**，生成模拟日志，查看一条检查结果。
+7. 源码候选版中，完成分析后可打开 **质量数据实验室**，试改模拟记录或练习二次、三次检验。[步骤与范围](docs/LABORATORY.md)。
 
 默认示例的结果：
 

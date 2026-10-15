@@ -13,6 +13,7 @@ REPORT_LABELS = {
     "03_overdue_actions": "措施记录 / Actions",
 }
 STATUS_LABELS = {
+    'not_measured': '截至日期尚未检验 / Not measured as of date',
     "due_today": "今天到期 / Due today",
     "due_soon": "1–7 天内到期 / Due in 1–7 days",
     "later": "7 天以后到期 / Due later",
@@ -33,6 +34,12 @@ FILTERS = {
     "03_overdue_actions": ("overdue",),
 }
 FIELD_LABELS = {
+    'baseline_count': '原始情景 / Baseline', 'scenario_count': '假设情景 / Scenario',
+    'attempt': '检验轮次 / Attempt',
+    'baseline_value': '原始检验值 / Baseline value', 'scenario_value': '假设检验值 / Scenario value',
+    'baseline_low': '原始下限 / Baseline low', 'scenario_low': '假设下限 / Scenario low',
+    'baseline_high': '原始上限 / Baseline high', 'scenario_high': '假设上限 / Scenario high',
+    'baseline_date': '原始检验日期 / Baseline measured', 'scenario_date': '假设检验日期 / Scenario measured',
     "review_status": "复核状态 / Review status", "reviewer": "复核人 / Reviewer", "review_note": "复核备注 / Review note",
     "open_deviations": "未关闭偏差 / Open deviations", "overdue_actions": "逾期措施 / Overdue actions",
     "explanation": "说明 / Explanation",

@@ -130,6 +130,39 @@ def self_test(folder):
             root.update();time.sleep(.03)
         if not timeline.result or [r['open_deviations'] for r in timeline.result['rows'][-2:]] != [22,17]:
             raise AssertionError('Packaged multi-date quality review failed.')
+        laboratory = window.open_laboratory()
+        if laboratory is None:
+            raise AssertionError('Packaged laboratory did not open from completed snapshot.')
+        laboratory.window.withdraw()
+        selected = laboratory.model.tests[0]
+        original_value = selected['value']
+        midpoint = selected['spec_low'] / 2 + selected['spec_high'] / 2
+        laboratory.fields['value'].set(str(midpoint))
+        laboratory.buttons['stage'].invoke()
+        laboratory.buttons['run'].invoke()
+        deadline = time.monotonic() + 60
+        while laboratory.busy and time.monotonic() < deadline:
+            root.update();time.sleep(.01)
+        if laboratory.busy or not laboratory.result:
+            raise AssertionError('Packaged laboratory scenario did not finish.')
+        if laboratory.result['baseline_metrics'] != expected:
+            raise AssertionError('Laboratory baseline differs from the original snapshot.')
+        laboratory.reason.set('Preset synthetic exercise')
+        for fields in laboratory.repeat_fields:
+            fields['value'].set(str(midpoint))
+        laboratory.buttons['evaluate'].invoke()
+        deadline = time.monotonic() + 60
+        while laboratory.busy and time.monotonic() < deadline:
+            root.update();time.sleep(.01)
+        if laboratory.busy or not laboratory.rechecks or len(laboratory.repeat_table.rows) != 3:
+            raise AssertionError('Packaged repeat exercise failed.')
+        if laboratory.repeat_table.rows[0]['value'] != original_value:
+            raise AssertionError('Repeat exercise replaced the initial result.')
+        experiment = dict(laboratory.result, rechecks=laboratory.rechecks)
+        laboratory.model.export(experiment, folder/'laboratory-export')
+        if not (folder/'laboratory-export/manifest.json').is_file():
+            raise AssertionError('Packaged laboratory export did not complete.')
+        laboratory.reset()
         fixed_id = batch.result["batch"]["batch_id"]
         window.toggle_language()
         window.toggle_theme()
@@ -157,7 +190,10 @@ def self_test(folder):
                               "read-only audit CSV header inspection",
                               "multi-date quality snapshots and movement exports",
                               "review note save, reopen and full export",
-                              "review note history at minimum window size"],
+                              "review note history at minimum window size",
+                              "isolated laboratory comparison and unchanged baseline",
+                              "three-attempt practice retaining initial result",
+                              "replayable laboratory exports and reset"],
                     "metrics": result["metrics"], "operations_metrics":operations["metrics"],
                     "persistent_output_root":str(output_root())}
         (folder / "SELF_TEST.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2), encoding="utf-8")

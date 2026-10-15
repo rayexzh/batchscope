@@ -6,7 +6,7 @@ Review synthetic batch records and audit logs. Compare their changes across date
 
 [Windows download](https://github.com/rayexzh/batchscope/releases/tag/v0.6.0-alpha.5) · [78-second animation](https://github.com/rayexzh/batchscope/releases/download/v0.6.0-alpha.1/BatchScope-Short-Explainer.mp4) · [Documentation](docs/INDEX.md)
 
-**Published Windows release: v0.6.0-alpha.5.** A local desktop demonstration using synthetic data only. The local source candidate is v0.6.0-alpha.6; see the [maintenance review](docs/REVIEW-2026-10-10.md) for changes and verification limits.
+**Published Windows release: v0.6.0-alpha.5.** A local desktop demonstration using synthetic data only. The source candidate is v0.7.0-alpha.1, with a [quality data laboratory](docs/LABORATORY.md) and the [maintenance fixes](docs/REVIEW-2026-10-10.md).
 
 ## What it is for
 
@@ -25,6 +25,7 @@ BatchScope links these records and shows their state at an explicit **as-of date
 | **Action follow-up** | Which outstanding actions were overdue? Which batch and deviation do they belong to? |
 | **Date comparison** | What changed across 2–12 dates, and between adjacent dates? |
 | **Audit log review** | Which events lack a reason, conflict with configured permissions, or have unusual timestamps? |
+| **Quality data laboratory** | What changes when a synthetic result, bound or measurement date is edited? What happens across two or three retained attempts? |
 
 Open a record to follow its links to the batch, measurements, deviations and actions. Tables support search, sorting and copying. The interface offers Chinese/English switching, themes and font-size controls.
 
@@ -40,6 +41,7 @@ Record a review status and reason for each finding. Notes are saved separately, 
 4. Open a record and follow it back to its batch.
 5. Open **Multi-date review** and compare several dates, or use the original two-date comparison.
 6. Open **Audit log review**, generate the sample log, and inspect a finding.
+7. In the source candidate, open **Quality data laboratory** after analysis to try a change or a two-/three-attempt exercise. [Steps and limits](docs/LABORATORY.md).
 
 The default example gives these results:
 

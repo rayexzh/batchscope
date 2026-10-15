@@ -3,6 +3,7 @@ from collections import Counter
 from pathlib import Path
 import os
 import queue
+import sqlite3
 import tempfile
 import threading
 import sys
@@ -20,6 +21,7 @@ from runtime_paths import output_root
 from workbench_ui import WorkbenchWindow
 from audit_ui import AuditWindow
 from timeline_ui import TimelineWindow
+from qualitylab_ui import LaboratoryWindow
 
 ROOT = Path(__file__).resolve().parent
 PRIORITY = ["product", "test_type", "outside_range_records", "outside_range_pct", "missing_records",
@@ -349,6 +351,8 @@ class Window:
         self.audit_button.pack(side="left")
         self.timeline_button = ttk.Button(extra_toolbar, command=self.open_timeline)
         self.timeline_button.pack(side="left", padx=8)
+        self.lab_button = ttk.Button(extra_toolbar, command=self.open_laboratory, state='disabled')
+        self.lab_button.pack(side='left')
         self.language_button = ttk.Button(toolbar, command=self.toggle_language)
         self.language_button.pack(side="right")
         self.theme_button = ttk.Button(toolbar, command=self.toggle_theme)
@@ -455,6 +459,7 @@ class Window:
         self.report_button.configure(text=self.t("open_review"))
         self.audit_button.configure(text="审计日志复核" if self.language == "zh" else "Audit log review")
         self.timeline_button.configure(text="多日期对比" if self.language == "zh" else "Multi-date review")
+        self.lab_button.configure(text=self.t('laboratory'))
         self.language_button.configure(text="English" if self.language == "zh" else "中文")
         self.theme_button.configure(text=self.t("dark" if self.theme == "light" else "light"))
         for key, (value, label) in self.metric_cards.items():
@@ -597,7 +602,7 @@ class Window:
         self.running_inputs = (str(folder.resolve()), as_of, from_date if comparison else None)
         self.phase, self.notice = "working", None
         self.metrics.set("")
-        for control in (self.run_button, self.generate_button, self.browse_button, self.date_entry, self.input_entry, self.open_button, self.detail_button, self.compare_button, self.from_entry, self.view_compare_button, self.work_button, self.report_button, self.audit_button, self.timeline_button):
+        for control in (self.run_button, self.generate_button, self.browse_button, self.date_entry, self.input_entry, self.open_button, self.detail_button, self.compare_button, self.from_entry, self.view_compare_button, self.work_button, self.report_button, self.audit_button, self.timeline_button, self.lab_button):
             control.configure(state="disabled")
         self.apply_view()
         self.progress.pack(fill="x", pady=(0, 8), before=self.card_row)
@@ -634,6 +639,7 @@ class Window:
             self.detail_button.configure(state="normal" if ok else "disabled")
             self.work_button.configure(state="normal" if ok else "disabled")
             self.report_button.configure(state="normal" if ok else "disabled")
+            self.lab_button.configure(state='normal' if ok else 'disabled')
             if ok:
                 self.result, self.phase = result, "completed"
                 self.result_inputs = self.running_inputs
@@ -703,6 +709,19 @@ class Window:
         if self.busy or not self.result or "operations" not in self.result:
             return None
         view = WorkbenchWindow(self, self.result, RecordTable)
+        self.review_views.append(view)
+        return view
+
+    def open_laboratory(self):
+        if self.busy or self.phase != 'completed' or not self.result or not self.output:
+            return None
+        folder = self.output / 'end_snapshot' if 'comparison' in self.result else self.output
+        try:
+            view = LaboratoryWindow(self, RecordTable, folder / 'quality.sqlite', self.result['as_of'],
+                                    self.result.get('artifact_sha256', {}).get('quality.sqlite'))
+        except (OSError, ValueError, sqlite3.Error) as exc:
+            messagebox.showerror(self.t('laboratory'), str(exc), parent=self.root)
+            return None
         self.review_views.append(view)
         return view
 

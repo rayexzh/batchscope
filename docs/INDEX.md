@@ -6,6 +6,7 @@ Local candidate / 本地候选版：[2026-10-10 maintenance review / 维护检�
 
 | Need / 需要 | Read / 入口 |
 |---|---|
+| Try a synthetic change / 模拟试错 | [Quality data laboratory](LABORATORY.md) · [v0.7.0 notes](RELEASE-v0.7.0-alpha.1.md) |
 | First run / 第一次运行 | [Quick start](QUICKSTART.md) · [Windows build](WINDOWS_BUILD.md) |
 | Watch / 看视频 | [English demonstration](DEMO_VIDEO.md), recorded on v0.5.0-alpha.2 |
 | Explain the business / 解释业务 | [Business brief](../BUSINESS_BRIEF.md) · [Worked case](CASE_STUDY.md) |
