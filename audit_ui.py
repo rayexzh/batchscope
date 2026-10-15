@@ -37,14 +37,27 @@ class AuditWindow:
         self.window = tk.Toplevel(owner.root)
         self.window.protocol('WM_DELETE_WINDOW',self.close)
         self.window.geometry('1100x700'); self.window.minsize(850,500)
-        frame = ttk.Frame(self.window, padding=18); frame.pack(fill='both',expand=True)
+        self.canvas = tk.Canvas(self.window, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self.window, command=self.canvas.yview)
+        scrollbar.pack(side='right', fill='y')
+        self.canvas.configure(yscrollcommand=scrollbar.set)
+        self.canvas.pack(fill='both', expand=True)
+        frame = ttk.Frame(self.canvas, padding=18)
+        self.content = self.canvas.create_window((0, 0), window=frame, anchor='nw')
+        self.canvas.bind('<Configure>', lambda event: self.canvas.itemconfigure(self.content, width=event.width))
+        frame.bind('<Configure>', lambda event: self.canvas.configure(scrollregion=self.canvas.bbox('all')))
+        self.window.bind('<MouseWheel>', self.scroll, add='+')
         self.title = ttk.Label(frame,style='Title.TLabel'); self.title.pack(anchor='w')
         self.buttons = {}
+        self.toolbars = []
         for keys in [('generate','open','format','policy'),('export','batch','timeline')]:
             row = ttk.Frame(frame); row.pack(fill='x',pady=6)
-            for key in keys:
+            self.toolbars.append((row, keys))
+            row.bind('<Configure>', lambda event: self.layout_actions())
+            for index, key in enumerate(keys):
                 command = self.choose_policy if key=='policy' else self.check_format if key=='format' else getattr(self,key)
-                button = ttk.Button(row,command=command); button.pack(side='left',padx=(0,8))
+                button = ttk.Button(row,command=command)
+                button.grid(row=0, column=index, sticky='w', padx=(0,8), pady=3)
                 self.buttons[key]=button
         self.caption = ttk.Label(frame,wraplength=800); self.caption.pack(fill='x',pady=8)
         self.search_label = ttk.Label(frame); self.search_label.pack(anchor='w')
@@ -57,6 +70,7 @@ class AuditWindow:
         self.buttons['annotate'].pack(side='left',padx=8)
         panel = ttk.Frame(frame); panel.pack(fill='both',expand=True)
         self.table = factory(panel,owner,self.details)
+        self.table.tree.configure(height=7)
         self.table.priority=['event_id','rule','review_status','batch_id','level','source_row','explanation','reviewer','review_note']
         self.scope = ttk.Label(frame,wraplength=800,style='Muted.TLabel'); self.scope.pack(fill='x',pady=8)
         self.search.trace_add('write',lambda *args:self.refresh())
@@ -76,9 +90,27 @@ class AuditWindow:
         self.scope.configure(wraplength=max(400,event.width-50))
         self.caption.configure(wraplength=max(400,event.width-50))
 
+    def scroll(self, event):
+        if event.delta and not isinstance(event.widget, (ttk.Treeview, ttk.Combobox, tk.Text)):
+            self.canvas.yview_scroll(-1 if event.delta > 0 else 1, 'units')
+            return 'break'
+
+    def layout_actions(self):
+        for toolbar, keys in self.toolbars:
+            width = toolbar.winfo_width()
+            row, column, used = 0, 0, 0
+            for key in keys:
+                button = self.buttons[key]
+                required = button.winfo_reqwidth() + 8
+                if used and used + required > width:
+                    row, column, used = row + 1, 0, 0
+                button.grid_configure(row=row, column=column)
+                used, column = used + required, column + 1
+
     def apply_view(self):
         self.window.title('BatchScope · '+self.text('title'))
         self.window.configure(background=self.owner.colors['background'])
+        self.canvas.configure(background=self.owner.colors['background'])
         self.title.configure(text=self.text('title'))
         for key,button in self.buttons.items():button.configure(text=self.text(key))
         self.scope.configure(text=self.text('scope'))
@@ -89,6 +121,7 @@ class AuditWindow:
         self.refresh()
         self.editors=[e for e in self.editors if e.window.winfo_exists()]
         for editor in self.editors:editor.apply_view()
+        self.layout_actions()
 
     def load(self,path,policy=None):
         # Limit this first UI iteration; CLI supports larger logs without rendering every row.

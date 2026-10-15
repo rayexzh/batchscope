@@ -31,6 +31,8 @@ TEXT = {
     'ready': ('选择检验记录，修改后先加入队列，再运行对比。', 'Select a test, stage edits, then run the comparison.'),
     'stale': ('有未重新计算的修改；请重新运行，旧结果不能作为当前情景导出。', 'Settings changed. Run again before exporting the current scenario.'),
     'draft': ('表单修改尚未加入队列；请先加入，或恢复选中记录。', 'Form edits are not staged. Stage them or restore the selected record first.'),
+    'repeat_draft': ('复检计划有未评价的修改；请重新评价后导出。', 'The recheck plan has unevaluated edits. Evaluate it again before exporting.'),
+    'other_drafts': ('其他检验记录还有草稿：{ids}。切回对应记录处理后再导出。', 'Other tests have pending drafts: {ids}. Return to those records before exporting.'),
     'done': ('对比完成：{date} · 修改 {count} 条记录；下表为本次计算结果。', 'Compared at {date}: {count} edited records. Tables show this run.'),
     'busy': ('正在计算 / 导出，请稍候。', 'Calculating / exporting…'),
     'wait': ('实验正在运行，请等完成后再关闭。', 'Wait for the experiment to finish before closing.'),
@@ -52,9 +54,12 @@ class LaboratoryWindow:
     def __init__(self, owner, factory, database, as_of, expected_sha256):
         self.owner, self.factory = owner, factory
         self.model = Laboratory(database, as_of, expected_sha256)
+        self.originals = {row['test_id']: row for row in self.model.tests}
         self.result, self.output, self.exported_state = None, None, None
         self.rechecks, self.events = [], queue.Queue()
         self.busy, self.poll_id, self.selected_id = False, None, None
+        self.record_forms, self.evaluated_plans = {}, {}
+        self.loading_forms = True
         self.window = tk.Toplevel(owner.root)
         self.window.transient(owner.root)
         self.window.geometry(f'1150x{min(900, owner.root.winfo_screenheight()-100)}')
@@ -119,7 +124,7 @@ class LaboratoryWindow:
             entry = ttk.Entry(form, textvariable=variable)
             entry.grid(row=index, column=1, sticky='ew', pady=3)
             self.fields[key], self.field_labels[key] = variable, label
-            variable.trace_add('write', lambda *args: self.render_status())
+            variable.trace_add('write', self.form_changed)
             self.field_entries.append(entry)
         self.blank_note = ttk.Label(edit, style='Muted.TLabel', wraplength=1000)
         self.blank_note.pack(fill='x', pady=5)
@@ -146,10 +151,10 @@ class LaboratoryWindow:
         self.repeat_original.pack(fill='x', pady=6)
         self.round_label = ttk.Label(repeated)
         self.round_label.pack(anchor='w')
-        self.rounds = ttk.Combobox(repeated, values=['2', '3'], state='readonly', width=6)
+        self.round_count = tk.StringVar(value='3')
+        self.rounds = ttk.Combobox(repeated, textvariable=self.round_count, values=['2', '3'], state='readonly', width=6)
         self.rounds.set('3')
         self.rounds.pack(anchor='w', pady=4)
-        self.rounds.bind('<<ComboboxSelected>>', lambda e: self.set_states())
         self.reason_label = ttk.Label(repeated)
         self.reason_label.pack(anchor='w')
         self.reason = tk.StringVar()
@@ -182,9 +187,12 @@ class LaboratoryWindow:
         self.repeat_table = factory(area, owner)
         self.repeat_table.priority = ['attempt', 'test_id', 'value', 'spec_low', 'spec_high', 'measured_on', 'snapshot_status', 'unit']
         self.repeat_table.tree.configure(height=4)
+        for variable in [self.reason, self.round_count, *(v for fields in self.repeat_fields for v in fields.values())]:
+            variable.trace_add('write', self.form_changed)
         self.as_of.trace_add('write', lambda *args: self.render_status())
         self.search.trace_add('write', lambda *args: self.refresh_tests())
         frame.bind('<Configure>', lambda e: self.wrap(e.width))
+        self.loading_forms = False
         self.apply_view()
         self.refresh_tests()
         items = self.test_table.tree.get_children()
@@ -204,9 +212,12 @@ class LaboratoryWindow:
     def draft_dirty(self):
         if not self.selected_id:
             return False
-        current = self.model.current(self.selected_id)
-        for key, variable in self.fields.items():
-            text = variable.get().strip()
+        return self.main_dirty(self.selected_id, {key: variable.get() for key, variable in self.fields.items()})
+
+    def main_dirty(self, test_id, form):
+        current = self.model.current(test_id)
+        for key, value in form.items():
+            text = value.strip()
             if key == 'measured_on':
                 if text != current[key]:
                     return True
@@ -218,6 +229,40 @@ class LaboratoryWindow:
                 if value != current[key]:
                     return True
         return False
+
+    def default_plan(self, test_id):
+        original = self.originals[test_id]
+        fields = {key: '' if original[key] is None else str(original[key]) for key in EDITABLE}
+        return {'rounds': '3', 'reason': '', 'fields': [dict(fields), dict(fields)]}
+
+    def repeat_plan(self):
+        return {'rounds': self.round_count.get(), 'reason': self.reason.get(),
+                'fields': [{key: variable.get() for key, variable in fields.items()} for fields in self.repeat_fields]}
+
+    def form_snapshot(self):
+        return {'main': {key: variable.get() for key, variable in self.fields.items()}, 'repeat': self.repeat_plan()}
+
+    def cache_form(self):
+        if self.selected_id and not self.loading_forms:
+            self.record_forms[self.selected_id] = self.form_snapshot()
+
+    def form_changed(self, *args):
+        if not self.loading_forms:
+            self.cache_form()
+            self.render_status()
+
+    def pending(self):
+        forms = dict(self.record_forms)
+        if self.selected_id:
+            forms[self.selected_id] = self.form_snapshot()
+        main, repeated = set(), set()
+        for test_id, form in forms.items():
+            if self.main_dirty(test_id, form['main']):
+                main.add(test_id)
+            reference = self.evaluated_plans.get(test_id, self.default_plan(test_id))
+            if form['repeat'] != reference:
+                repeated.add(test_id)
+        return main, repeated
 
     def apply_view(self):
         from review import field_label
@@ -241,8 +286,6 @@ class LaboratoryWindow:
         for table in (self.test_table, self.metric_table, self.transition_table, self.repeat_table):
             table.populate(table.rows, preserve=True)
         self.render_status()
-        if self.rechecks:
-            self.repeat_status.configure(text=self.text('ever_flagged' if self.rechecks[-1]['any_outside_range'] else 'no_flagged'))
         self.layout_actions()
 
     def layout_actions(self, event=None):
@@ -265,38 +308,66 @@ class LaboratoryWindow:
         row = self.test_table.selected()
         if not row or self.busy or row['test_id'] == self.selected_id and not force:
             return
+        if not force:
+            self.cache_form()
         self.selected_id = row['test_id']
         current = self.model.current(self.selected_id)
-        for key, variable in self.fields.items():
-            variable.set('' if current[key] is None else str(current[key]))
-        original = next(row for row in self.model.tests if row['test_id'] == self.selected_id)
-        for variables in self.repeat_fields:
-            for key, variable in variables.items():
-                variable.set('' if original[key] is None else str(original[key]))
+        saved = self.record_forms.get(self.selected_id, {
+            'main': {key: '' if current[key] is None else str(current[key]) for key in EDITABLE},
+            'repeat': self.default_plan(self.selected_id)})
+        self.loading_forms = True
+        try:
+            for key, variable in self.fields.items():
+                variable.set(saved['main'][key])
+            self.rounds.set(saved['repeat']['rounds'])
+            self.reason.set(saved['repeat']['reason'])
+            for variables, values in zip(self.repeat_fields, saved['repeat']['fields']):
+                for key, variable in variables.items():
+                    variable.set(values[key])
+        finally:
+            self.loading_forms = False
+        self.cache_form()
+        self.update_repeat_view()
         self.render_status()
+
+    def selected_exercise(self):
+        return next((row for row in reversed(self.rechecks) if row['test_id'] == self.selected_id), None)
+
+    def update_repeat_view(self):
+        exercise = self.selected_exercise()
+        self.repeat_table.populate(exercise['attempts'] if exercise else [])
 
     def render_status(self):
         if not hasattr(self, 'buttons') or 'evaluate' not in self.buttons:
             return
         self.selection_label.configure(text=self.text('selected', id=self.selected_id or '—', count=len(self.model.changes)))
         if self.selected_id:
-            original = next(row for row in self.model.tests if row['test_id'] == self.selected_id)
+            original = self.originals[self.selected_id]
             self.repeat_original.configure(text=self.text('original', id=self.selected_id,
                 value='—' if original['value'] is None else original['value'], unit=original['unit'],
                 low=original['spec_low'], high=original['spec_high'], date=original['measured_on']))
-        key = 'busy' if self.busy else 'draft' if self.draft_dirty() else 'stale' if self.stale() else 'done' if self.result else 'ready'
-        self.status.configure(text=self.text(key, date=self.result['as_of'] if self.result else '', count=len(self.model.changes)))
+        main, repeated = self.pending()
+        key = ('busy' if self.busy else 'draft' if self.selected_id in main else
+               'repeat_draft' if self.selected_id in repeated else 'other_drafts' if main or repeated else
+               'stale' if self.stale() else 'done' if self.result else 'ready')
+        self.status.configure(text=self.text(key, date=self.result['as_of'] if self.result else '',
+                              count=len(self.model.changes), ids=', '.join(sorted((main | repeated) - {self.selected_id}))))
+        exercise = self.selected_exercise()
+        repeat_key = ('repeat_draft' if self.selected_id in repeated else
+                      'ever_flagged' if exercise and exercise['any_outside_range'] else 'no_flagged' if exercise else None)
+        self.repeat_status.configure(text=self.text(repeat_key) if repeat_key else '')
         self.set_states()
 
     def set_states(self):
+        main, repeated = self.pending()
         for key, button in self.buttons.items():
             enabled = not self.busy
             if key in ('stage', 'restore', 'evaluate'):
                 enabled = enabled and self.selected_id is not None
             if key == 'export':
-                enabled = enabled and self.result is not None and not self.stale() and not self.draft_dirty()
+                enabled = enabled and self.result is not None and not self.stale() and not main and not repeated
             if key in ('run', 'evaluate'):
-                enabled = enabled and not self.draft_dirty()
+                enabled = enabled and not main
             if key == 'open':
                 enabled = enabled and self.output is not None
             button.configure(state='normal' if enabled else 'disabled')
@@ -305,7 +376,7 @@ class LaboratoryWindow:
         self.rounds.configure(state='disabled' if self.busy else 'readonly')
         for index, entries in enumerate(self.repeat_entries):
             for entry in entries:
-                entry.configure(state='disabled' if self.busy or index == 1 and self.rounds.get() == '2' else 'normal')
+                entry.configure(state='disabled' if self.busy or index == 1 and self.round_count.get() == '2' else 'normal')
 
     def stage(self):
         if self.busy or self.selected_id is None:
@@ -319,12 +390,16 @@ class LaboratoryWindow:
     def restore(self):
         if not self.busy and self.selected_id:
             self.model.reset(self.selected_id)
+            self.record_forms.pop(self.selected_id, None)
+            self.evaluated_plans.pop(self.selected_id, None)
             self.select(force=True)
 
     def reset(self):
         if self.busy:
             return
         self.model.reset()
+        self.record_forms.clear()
+        self.evaluated_plans.clear()
         self.result, self.rechecks, self.output, self.exported_state = None, [], None, None
         self.as_of.set(self.model.as_of)
         for table in (self.metric_table, self.transition_table, self.repeat_table):
@@ -347,21 +422,22 @@ class LaboratoryWindow:
         self.poll_id = self.window.after(50, self.poll)
 
     def run(self):
-        if self.draft_dirty():
+        if self.pending()[0]:
             self.render_status()
             return
         day = self.as_of.get().strip()
         self.launch('run', lambda: self.model.run(day))
 
     def evaluate(self):
-        if self.selected_id is None or self.busy or self.draft_dirty():
+        if self.selected_id is None or self.busy or self.pending()[0]:
             return
         test_id, day, reason = self.selected_id, self.as_of.get().strip(), self.reason.get()
+        form = deepcopy(self.repeat_plan())
         plans = [{key: variable.get().strip() for key, variable in values.items()}
-                 for values in self.repeat_fields[:int(self.rounds.get())-1]]
+                 for values in self.repeat_fields[:int(self.round_count.get())-1]]
         def operation():
             exercise = self.model.recheck(test_id, plans, reason)
-            return self.model.run(day), exercise
+            return self.model.run(day), exercise, (test_id, form)
         self.launch('recheck', operation)
 
     def poll(self):
@@ -379,10 +455,10 @@ class LaboratoryWindow:
             self.status.configure(text=self.text('exported', folder=value))
         else:
             if kind == 'recheck':
-                value, exercise = value
+                value, exercise, (test_id, form) = value
+                self.evaluated_plans[test_id] = form
                 self.rechecks.append(exercise)
-                self.repeat_table.populate(exercise['attempts'])
-                self.repeat_status.configure(text=self.text('ever_flagged' if exercise['any_outside_range'] else 'no_flagged'))
+                self.update_repeat_view()
             self.result = value
             self.metric_table.populate(value['metrics'])
             self.transition_table.populate(value['transitions'])
@@ -393,7 +469,7 @@ class LaboratoryWindow:
         self.set_states()
 
     def export(self):
-        if self.busy or self.result is None or self.stale() or self.draft_dirty():
+        if self.busy or self.result is None or self.stale() or any(self.pending()):
             return
         parent = filedialog.askdirectory(parent=self.window, title=self.text('export'))
         if not parent:
@@ -426,7 +502,7 @@ class LaboratoryWindow:
         if self.busy:
             messagebox.showinfo(self.text('title'), self.text('wait'), parent=self.window)
             return False
-        if self.draft_dirty() or (self.model.changes or self.rechecks) and self.exported_state != self.state():
+        if any(self.pending()) or (self.model.changes or self.rechecks) and self.exported_state != self.state():
             return messagebox.askyesno(self.text('title'), self.text('discard'), parent=self.window)
         return True
 

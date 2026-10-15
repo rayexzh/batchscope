@@ -17,7 +17,7 @@ from runtime_paths import RESOURCE_ROOT
 from workbench import build_operations, export_operations
 
 ROOT = RESOURCE_ROOT
-VERSION = "0.7.0-alpha.3"
+VERSION = "0.7.0-alpha.4"
 COLUMNS = {
     "batches": "batch_id product manufactured_on".split(),
     "test_results": "test_id batch_id test_type method value unit spec_low spec_high spec_unit measured_on".split(),
@@ -176,7 +176,9 @@ def load_inputs(folder, contents=None):
                 if parent and row[start] < parent["manufactured_on"]:
                     issue(table, line, start, "Event predates batch manufacture.")
             if parent is None:
-                issue(table, line, "parent_id", "Orphan foreign key.")
+                field = 'deviation_id' if table == 'actions' else 'batch_id'
+                target = 'deviations.csv' if table == 'actions' else 'batches.csv'
+                issue(table, line, field, f'Identifier was not found in {target}.')
             if end and row[end] is not None and row[end] < row[start]:
                 issue(table, line, end, "Completion/closure predates creation/opening.")
             if table == "test_results":

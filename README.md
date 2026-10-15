@@ -15,6 +15,8 @@ You can compare dates, follow a record back to its batch, or try a change in the
 
 The laboratory also has a two-/three-attempt exercise. Every result stays visible, including an initial result outside the range. More attempts or narrower ranges do not automatically mean greater accuracy.
 
+Drafts stay with each record while the laboratory window is open. After changing a repeat plan, evaluate it again before exporting.
+
 ![Data laboratory](docs/screenshots/laboratory-en.png)
 
 The app runs locally. It has Chinese and English interfaces, search, date comparisons and report exports. Missing results stay missing. Possible duplicates are listed for review and are not deleted.

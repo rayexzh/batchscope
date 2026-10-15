@@ -94,6 +94,13 @@ def self_test(folder):
         mixed = [r for r in mixed_check['findings'] if r['field'] == 'spec_low/spec_high']
         if not mixed_check['can_analyse'] or not mixed or not all(r['reference_value'] for r in mixed):
             raise AssertionError('Packaged range review lost comparison evidence or blocked valid data.')
+        rows[1][COLUMNS['test_results'].index('batch_id')] = 'NO-SUCH-BATCH'
+        with (bad_inputs / 'test_results.csv').open('w', encoding='utf-8-sig', newline='') as handle:
+            csv.writer(handle).writerows(rows)
+        orphan = check_inputs(bad_inputs)
+        if not any(r['field'] == 'batch_id' and r['value'] == 'NO-SUCH-BATCH' and
+                   'batches.csv' in r['reason'] for r in orphan['findings']):
+            raise AssertionError('Packaged orphan finding omitted the entered field or identifier.')
         window.as_of.set("2026-06-30")
         window.start()
         deadline = time.monotonic() + 60
@@ -208,6 +215,17 @@ def self_test(folder):
         laboratory.model.export(experiment, folder/'laboratory-export')
         if not (folder/'laboratory-export/manifest.json').is_file():
             raise AssertionError('Packaged laboratory export did not complete.')
+        laboratory.reason.set('Changed after evaluation')
+        if not laboratory.pending()[1] or not laboratory.buttons['export'].instate(['disabled']):
+            raise AssertionError('Packaged repeat edit did not invalidate export.')
+        laboratory.reason.set('Preset synthetic exercise')
+        laboratory.fields['value'].set('101.25')
+        laboratory.test_table.tree.selection_set('1');laboratory.select();root.update()
+        if not laboratory.pending()[0] or not laboratory.buttons['export'].instate(['disabled']):
+            raise AssertionError('Packaged selection lost the hidden main draft.')
+        laboratory.test_table.tree.selection_set('0');laboratory.select();root.update()
+        if laboratory.fields['value'].get() != '101.25':
+            raise AssertionError('Packaged record switch discarded the typed value.')
         laboratory.reset()
         laboratory.fields['value'].set('0')
         laboratory.stage()
@@ -225,6 +243,17 @@ def self_test(folder):
         for button in (window.run_button,window.open_button,window.compare_button,window.view_compare_button):
             if not button.winfo_ismapped() or button.winfo_width() < button.winfo_reqwidth():
                 raise AssertionError("A date control label is clipped.")
+        audit.window.deiconify();audit.window.geometry('850x500')
+        for _ in range(5):root.update()
+        for toolbar, keys in audit.toolbars:
+            for key in keys:
+                button = audit.buttons[key]
+                if button.winfo_width() < button.winfo_reqwidth() or button.winfo_x()+button.winfo_width()>toolbar.winfo_width():
+                    raise AssertionError('Packaged audit toolbar label is clipped.')
+        audit.canvas.yview_moveto(1);root.update()
+        if audit.scope.winfo_rooty()+audit.scope.winfo_height()>audit.canvas.winfo_rooty()+audit.canvas.winfo_height():
+            raise AssertionError('Packaged audit evidence footer is unreachable.')
+        audit.window.withdraw()
         root.withdraw()
         if batch.result["batch"]["batch_id"] != fixed_id:
             raise AssertionError("Batch changed during presentation switch.")
@@ -250,7 +279,11 @@ def self_test(folder):
                               "ambiguous numeric input rejected with row evidence",
                               "full bilingual input-check export and manifest",
                               "non-zero underflow blocked in input files and drafts",
-                              "mixed ranges retained with row and comparison evidence"],
+                              "mixed ranges retained with row and comparison evidence",
+                              "per-record drafts retained across selection",
+                              "unevaluated repeat edits block export",
+                              "orphan findings preserve actual field and identifier",
+                              "audit toolbars wrap and evidence scrolls at minimum size"],
                     "metrics": result["metrics"], "operations_metrics":operations["metrics"],
                     "persistent_output_root":str(output_root())}
         (folder / "SELF_TEST.json").write_text(json.dumps(evidence,ensure_ascii=False,indent=2), encoding="utf-8")

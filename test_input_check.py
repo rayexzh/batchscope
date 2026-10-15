@@ -40,6 +40,25 @@ class InputCheckTests(unittest.TestCase):
         self.assertEqual(result['metrics']['measured_records'], 3)
         self.assertEqual(result['metrics']['outside_range_records'], 0)
 
+    def test_orphan_findings_name_the_real_column_and_entered_identifier(self):
+        import shutil
+        for table, columns, row, field, target in [
+            ('test_results', quality_ops.COLUMNS['test_results'],
+             ['X', 'NOT-FOUND', 'assay', 'demo', 100, '%', 95, 105, '%', '2026-01-02'], 'batch_id', 'batches.csv'),
+            ('deviations', quality_ops.COLUMNS['deviations'],
+             ['D1', 'NOT-FOUND', 'demo', '2026-01-02', ''], 'batch_id', 'batches.csv'),
+            ('actions', quality_ops.COLUMNS['actions'],
+             ['A1', 'NOT-FOUND', 'QC', '2026-01-02', '2026-01-03', ''], 'deviation_id', 'deviations.csv')]:
+            source = self.root / ('orphan-' + table)
+            shutil.copytree(self.inputs, source)
+            with (source / (table + '.csv')).open('w', encoding='utf-8-sig', newline='') as handle:
+                writer = csv.writer(handle);writer.writerow(columns);writer.writerow(row)
+            checked = check_inputs(source)
+            self.assertFalse(checked['can_analyse'])
+            finding = next(r for r in checked['findings'] if target in r['reason'])
+            self.assertEqual((finding['table'], finding['row'], finding['field'], finding['value']),
+                             (table, 2, field, 'NOT-FOUND'))
+
     def test_read_only_check_retains_missing_and_future_records(self):
         before = {p.name: p.read_bytes() for p in self.inputs.iterdir()}
         result = check_inputs(self.inputs)

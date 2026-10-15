@@ -49,6 +49,8 @@ REASONS_ZH = {
     'Due date predates action creation.': '到期日期早于措施创建日期。',
     'Event predates batch manufacture.': '记录日期早于该批次生产日期。',
     'Orphan foreign key.': '找不到对应的批次或偏差编号。',
+    'Identifier was not found in deviations.csv.': '在 deviations.csv 中找不到这个偏差编号。',
+    'Identifier was not found in batches.csv.': '在 batches.csv 中找不到这个批次编号。',
     'Completion/closure predates creation/opening.': '完成或关闭日期早于创建或开启日期。',
     'Result and specification units differ; no automatic conversion.': '检验值与范围的单位不一致，程序不会自动换算。',
     'Lower specification exceeds upper specification.': '下限高于上限。',

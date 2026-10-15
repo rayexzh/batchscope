@@ -18,6 +18,16 @@ Changes in counts need context. Moving a measurement beyond the as-of date remov
 
 数量变化需要结合条件阅读。把检验日期移到截至日期之后，会减少当日统计记录，不代表质量改善；修改范围仅是假设，不是批准规格。超范围不会自动生成偏差或措施。
 
+## Drafts / 草稿
+
+Drafts stay with each test while this laboratory window remains open. Switching records or changing language does not discard them. If another record has pending edits, its ID is shown in the status. Stage or restore main edits before calculating; evaluate changed repeat plans before exporting. Close confirmation includes pending forms across all visited records. Drafts are held in memory, not saved to disk.
+
+实验室窗口打开期间，各条检验保留自己的草稿；切换记录或语言不会丢掉输入。其他记录还有草稿时，状态栏显示其编号。主表单需先加入队列或恢复，再计算；复检计划改过后需重新评价，才能导出。关闭确认也检查其他记录的草稿。草稿暂存在内存中，不是落盘保存。
+
+Changing a repeat value, bound, date, attempt count or reason marks the plan pending. A failed evaluation keeps the previous evaluated attempts and the changed draft. Returning to a record shows its own last evaluated attempts. A later successful evaluation adds another retained exercise; it does not overwrite the earlier one. **Restore selected** discards that record's current forms and queued edits. **Reset entire experiment** clears all drafts, queued edits and exercises in this window.
+
+复检值、范围、日期、轮次或理由改动后，计划会标记为未评价。评价失败会保留旧结果及新草稿。切回记录时显示该记录自己的上次评价；再次评价成功会保留一份新练习，不覆盖此前练习。「恢复选中记录」丢弃该记录当前表单及排队修改；「清空实验」清除本窗口所有草稿、排队修改和练习。
+
 ## Two- and three-attempt practice / 二次、三次检验练习
 
 Select a test in the editing tab, then open **Recheck exercise**. The original result, bounds and date are shown before you enter the plan. Choose two or three total attempts, provide a reason, then enter all additional results, bounds and dates before evaluating.

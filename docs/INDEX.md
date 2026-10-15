@@ -18,6 +18,7 @@ Windows download / 下载：[Releases / 发布页面](https://github.com/rayexzh
 | Teacher exercise / 教学试用 | [Worksheet](teacher-review/WORKSHEET.zh-CN.md) · [AI-simulated review](teacher-review/REPORT.zh-CN.md) |
 | Simulated review / 模拟试用 | [Observed findings and fixes](SIMULATED-USABILITY-REVIEW.md) |
 | Simulated QA/QC roles / 模拟岗位试用 | [2026-10-04 task review](SIMULATED-ROLE-REVIEW-2026-10-04.md) |
+| Draft and export fixes / 草稿与导出修复 | [2026-10-16 workflow review](QC-WORKFLOW-REVIEW-2026-10-16.md) |
 | Changes / 版本变化 | [Changelog](../CHANGELOG.md) |
 | Other independent project / 另一个项目 | [RxDataLint](https://github.com/rayexzh/rx-data-lint) |
 

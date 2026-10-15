@@ -1,5 +1,11 @@
 # Change log / 更新日志
 
+## v0.7.0-alpha.4 (2026-10-16) — Keep drafts / 保留草稿
+
+- Keep main and repeat forms per record within the open laboratory. Pending forms are checked before export and close. / 实验室窗口内按记录保留主表单和复检草稿，导出和关闭时检查未处理内容。
+- Require changed repeat plans to be evaluated again. Keep previous evaluated exercises and show attempts for the selected test. / 复检计划改动后需重新评价；保留旧练习，显示选中检验自己的评价记录。
+- Identify the actual field, entered value and missing parent table for broken references. / 关联编号错误显示实际列名、输入值及目标表。
+- Wrap audit actions and allow scrolling through the form at small window sizes. / 审计按钮随宽度换行，小窗口可滚动查看全部内容。
 ## v0.7.0-alpha.3 (2026-10-16) — Compare ranges / 范围核对
 
 - Flag different ranges for like measurements, including across batches. Retain each record and show a comparison value and row; no range is labelled approved. / 提示同类检验的范围差异，保留每条记录，列出对照值和行号，不指定批准规格。

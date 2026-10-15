@@ -1,0 +1,103 @@
+{
+  "project": "BatchScope",
+  "version": "0.7.0-alpha.4",
+  "date": "2026-10-16",
+  "kind": "AI-operated simulated QC/QA software walkthrough",
+  "original_inputs_and_baseline_database_unchanged": true,
+  "observations": [
+    {
+      "case": "QC-01 independent boundary, zero and missing-value arithmetic",
+      "status": "passed",
+      "expected": {
+        "measured_records": 5,
+        "judgeable_records": 4,
+        "missing_records": 1,
+        "outside_range_records": 1,
+        "open_deviations": 2,
+        "overdue_actions": 1
+      },
+      "actual": {
+        "measured_records": 5,
+        "judgeable_records": 4,
+        "missing_records": 1,
+        "outside_range_records": 1,
+        "open_deviations": 2,
+        "overdue_actions": 1
+      }
+    },
+    {
+      "case": "QA-02 due-date and snapshot boundaries",
+      "status": "passed"
+    },
+    {
+      "case": "QC-03 later repeats never replace the first result",
+      "status": "passed"
+    },
+    {
+      "case": "QC-04 malformed values stop before database creation",
+      "status": "passed"
+    },
+    {
+      "case": "QA-05 review differing ranges without rejecting the data",
+      "status": "passed"
+    },
+    {
+      "case": "F-03 orphan input should identify the actual foreign-key field and value",
+      "status": "not_reproduced",
+      "finding": {
+        "table": "actions",
+        "row": 2,
+        "field": "deviation_id",
+        "level": "error",
+        "value": "QC-NOT-FOUND",
+        "reason": "Identifier was not found in deviations.csv.",
+        "related_row": null,
+        "reference_value": ""
+      }
+    },
+    {
+      "case": "L-01 documented decimal-precision limit at a boundary",
+      "status": "documented_limitation",
+      "entered_value": "94.999999999999999",
+      "stored_value": 95.0,
+      "decimal_below_lower_bound": true,
+      "stored_value_below_lower_bound": false
+    },
+    {
+      "case": "QC-06 native preflight search and full export",
+      "status": "passed"
+    },
+    {
+      "case": "QA-07 native action-to-batch tracing",
+      "status": "passed"
+    },
+    {
+      "case": "F-01 record selection should protect an unstaged edit",
+      "status": "not_reproduced",
+      "typed_value": "101.25",
+      "value_after_switching_back": "101.25",
+      "confirmation_prompts": 0
+    },
+    {
+      "case": "F-02A repeat form edits should invalidate or label the previous evaluation",
+      "status": "not_reproduced",
+      "export_enabled_after_edit": false,
+      "close_allowed_without_prompt": false,
+      "confirmation_prompts": 1,
+      "pending_notice": "The recheck plan has unevaluated edits. Evaluate it again before exporting."
+    },
+    {
+      "case": "F-02B a new repeat draft should participate in close confirmation",
+      "status": "not_reproduced",
+      "close_allowed": false,
+      "confirmation_prompts": 1
+    },
+    {
+      "case": "F-04 supported font at the audit window minimum size",
+      "status": "passed",
+      "clipped_buttons": [],
+      "scope_visible": true
+    }
+  ],
+  "limits": "No real QC/QA professional, real company records, regulatory validation or independent clean machine was involved."
+}
