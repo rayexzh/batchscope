@@ -1,24 +1,14 @@
-# QC workflow checks / QC 流程检查
+# v0.7.0-alpha.4 修复记录 / Fixes
 
-An AI-operated test of the desktop controls using fictional data found four workflow problems in v0.7.0-alpha.3. The same tasks were repeated after the fixes. This is software testing, not feedback from an independent QC professional.
+| 操作 / Task | 修复后 / Result |
+|---|---|
+| 切换检验记录 / Switch tests | 保留各条记录的草稿。 / Keep drafts for each record. |
+| 修改复检计划 / Edit a repeat plan | 重新评价后才能导出；关闭会提醒未处理的草稿。 / Require re-evaluation before export; warn before discarding drafts. |
+| 关联编号填错 / Enter an unknown ID | 显示真实列名、填入的编号和目标表。 / Show the column, entered ID and target table. |
+| 缩小审计窗口 / Resize the audit window | 按钮换行，记录和说明可滚动查看。 / Wrap buttons and scroll to records and notes. |
 
-使用虚构数据操作桌面控件，在 v0.7.0-alpha.3 中复现四处问题；修复后重做了相同任务。这是 AI 执行的软件测试，不是真实质检员的独立反馈。
+使用模拟数据自动测试，126 项通过；原始数据未改动。 / 126 automated tests passed with fictional data; source data stayed unchanged.
 
-| Task / 操作 | Before / 之前 | After / 修复后 |
-|---|---|---|
-| Switch records / 切换记录 | Unstaged `101.25` disappeared. / 未加入队列的输入丢失。 | The draft remains with its record; hidden drafts also block export. / 按记录保留草稿，其他记录的草稿也计入导出检查。 |
-| Edit a repeat / 修改复检 | `110` on the form could export the earlier `100` without a pending notice. / 表单改动后仍可直接导出旧评价。 | Export is blocked until evaluation; close asks about pending edits. / 重新评价前不能导出，关闭会提示未处理的输入。 |
-| Enter a missing parent ID / 关联编号输错 | Finding showed `parent_id` and a blank value. / 提示字段不实际、原值为空。 | Shows `deviation_id`, `QC-NOT-FOUND` and `deviations.csv`. / 显示真实列名、编号和目标表。 |
-| Use a small audit window / 缩小审计窗口 | Buttons and evidence were clipped at `850 × 500`, font 14. / 按钮和记录被挤出。 | Actions wrap; the table and notes can be reached by scrolling. Tested in both languages. / 按钮换行，列表和说明可滚动到达，中英文均有测试。 |
+草稿只保留在打开的窗口内。高精度小数仍受浮点舍入影响，见[输入说明](INPUT_CHECK.md)。 / Drafts last only while the window is open. Decimal precision remains limited by floating-point rounding; see the [input guide](INPUT_CHECK.md).
 
-![Wrapped controls / 按钮换行](screenshots/audit-small-controls-en.png)
-
-![Evidence reached by scrolling / 滚动查看记录和说明](screenshots/audit-small-evidence-en.png)
-
-126 source tests passed locally. The follow-up walkthrough contains 13 observations, including a known floating-point precision limit. Original input files and the baseline database stayed unchanged. Tests cover all repeat fields, record switching, failed evaluation, edits arriving during a worker job, and export history. See the [observations](validation/qc-workflow-20261016.json) and [GUI regressions](../test_qc_workflow_ui.py).
-
-本地 126 项测试通过。跟踪试用记录 13 项观察，其中包含一项已知的浮点精度限制。原始输入和基线数据库未改变；新增测试涵盖每个复检字段、切换记录、评价失败、计算期间出现改动，以及导出历史。
-
-Very close decimal boundaries can still round to the same binary floating-point value, for example `94.999999999999999` and `95`. This release protects draft workflows; it does not change numeric precision or establish suitability for real batch release. Drafts are held only while the laboratory window remains open.
-
-极接近边界的小数仍可能舍入为同一个浮点数，例如 `94.999999999999999` 与 `95`。本轮修复草稿流程，没有改变数值精度，也不证明适合真实批次放行。草稿仅保留在打开的实验室窗口中。
+[测试记录 / Test results](validation/qc-workflow-20261016.json) · [回归测试 / Regression tests](../test_qc_workflow_ui.py) · [按钮截图 / Buttons](screenshots/audit-small-controls-en.png) · [记录截图 / Records](screenshots/audit-small-evidence-en.png)

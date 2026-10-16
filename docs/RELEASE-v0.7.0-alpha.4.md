@@ -1,15 +1,12 @@
 # BatchScope v0.7.0-alpha.4
 
-Laboratory drafts now stay with each record while the window is open. Edited repeat plans must be evaluated again before export. Closing checks for pending edits, including those on other records. Earlier evaluated exercises remain in the export.
+- 切换记录保留草稿。 / Keep drafts when switching records.
+- 修改复检计划后，重新评价才能导出。 / Re-evaluate edited repeat plans before export.
+- 关联错误显示列名、编号和目标表。 / Show the column, ID and target table for broken links.
+- 审计按钮自动换行，内容可滚动。 / Wrap audit buttons and scroll through the content.
 
-实验室窗口内按记录保留草稿。复检计划改动后，需重新评价才能导出；关闭时也会检查其他记录里未处理的输入。此前评价过的练习仍保留在导出中。
+草稿只保留在打开的窗口内。 / Drafts last only while the window is open.
 
-Broken-reference findings now show the actual column, entered identifier and target table. Audit buttons wrap onto another row, and small windows can scroll to the evidence and notes.
+[Windows 下载 / Download](https://github.com/rayexzh/batchscope/releases/tag/v0.7.0-alpha.4) · [用法 / Guide](LABORATORY.md) · [测试 / Tests](QC-WORKFLOW-REVIEW-2026-10-16.md)
 
-关联编号错误会显示真实列名、输入编号和目标表。审计按钮空间不足时换行，小窗口可以滚动找到原始记录和说明。
-
-[Laboratory guide / 实验室用法](LABORATORY.md) · [Tested workflows / 测试记录](QC-WORKFLOW-REVIEW-2026-10-16.md)
-
-The Windows ZIP includes `BatchScope.exe`. Checksums and validation records are attached. Tests use fictional data; they are not independent user acceptance or regulatory validation. Numeric calculations still use binary floating point, with the precision limits described in the input-check guide.
-
-Windows ZIP 内含 `BatchScope.exe`，附件提供校验值和验证记录。测试使用虚构数据，不代表外部用户验收或法规验证。数值计算仍采用二进制浮点，精度限制见输入预检说明。
+仅用模拟数据，不用于真实批次放行。 / Fictional data only; not for real batch release.
