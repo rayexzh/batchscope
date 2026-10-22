@@ -151,7 +151,7 @@ class InputCheckTests(unittest.TestCase):
         self.assertEqual(result['input_sha256']['test_results.csv'], digest)
         self.assertNotEqual(hashlib.sha256(path.read_bytes()).hexdigest(), digest)
         with closing(sqlite3.connect(self.root / 'captured/quality.sqlite')) as db:
-            self.assertEqual(db.execute("SELECT value FROM test_results WHERE test_id='T1'").fetchone()[0], 90)
+            self.assertEqual(db.execute("SELECT value FROM test_results WHERE test_id='T1'").fetchone()[0], '90')
         check = json.loads((self.root / 'captured/INPUT_CHECK.json').read_text(encoding='utf-8'))
         self.assertEqual(check['input_sha256'], result['input_sha256'])
 
@@ -203,8 +203,8 @@ class InputCheckTests(unittest.TestCase):
         self.assertTrue(result['can_analyse'])
         self.assertEqual({r['row'] for r in found}, {2, 3, 4})
         self.assertEqual({(r['row'], r['related_row']) for r in found}, {(2, 3), (3, 2), (4, 3)})
-        self.assertEqual(found[0]['value'], '95.0 .. 105.0')
-        self.assertEqual(found[0]['reference_value'], '85.0 .. 105.0')
+        self.assertEqual(found[0]['value'], '95 .. 105')
+        self.assertEqual(found[0]['reference_value'], '85 .. 105')
         final = analyse(self.inputs, self.root / 'different-ranges', '2026-06-30')
         self.assertEqual(final['metrics'], self.baseline['metrics'])
         self.assertEqual((self.inputs / 'test_results.csv').read_bytes(), before)
@@ -216,7 +216,7 @@ class InputCheckTests(unittest.TestCase):
         self.assertTrue(all(r['reference_value'] for r in comparisons))
         body = (exported / 'INPUT_CHECK.en.html').read_text(encoding='utf-8')
         self.assertIn('not approved', body)
-        self.assertIn('85.0 .. 105.0', body)
+        self.assertIn('85 .. 105', body)
 
     def test_range_comparisons_never_mix_different_methods_tests_units_or_products(self):
         for field, replacement in ((2, 'purity'), (3, 'another-method'), (5, 'mg')):

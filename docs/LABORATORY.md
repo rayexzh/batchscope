@@ -57,3 +57,20 @@ python quality_ops.py analyse <experiment>/scenario <new-scenario-output> --as-o
 ```
 
 Use the as-of date stored in `EXPERIMENT.json` and new output folders. **Reset entire experiment** clears queued edits and practice results; it does not delete exports or source files. / 使用实验 JSON 中的截至日期及新的输出目录。「清空实验」清除排队修改和练习结果，不删除已导出文件或原始数据。
+
+
+## Save progress / 保存进度
+
+Click **Save progress** to save a new `.bslab` file. It includes the baseline snapshot, staged changes, unfinished forms and evaluated attempts. On the main window, **Open lab progress** reopens it without the original output folder. Run comparison again before exporting. Existing progress files are not overwritten; choose a new name.
+
+点「保存进度」保存为新的 `.bslab` 文件，包含基准数据、排队修改、未完成表单和已评价轮次。下次在主窗口点「打开实验室进度」，不需要原输出文件夹。恢复后重新运行对比，再导出结果。已有进度文件不会覆盖，请另取名字。
+
+Progress is an editable working file, not an approved record or completed report. The snapshot checksum detects changed bytes; it does not authenticate the author.
+
+进度是可编辑的工作文件，不是批准记录或已完成报告。快照校验值用于检查文件内容，不认证作者。
+
+## Decimal values / 小数
+
+Results and limits retain their input text. Comparisons use decimal values, so `94.999999999999999` is below `95`. Boundaries are inclusive. JSON stores these values as strings. For direct SQLite queries, call `decimal_values.configure(connection)` before running the supplied SQL. Do not cast results to REAL before comparing. Older databases already stored as REAL cannot recover lost digits; analyse the original CSV again.
+
+检验值和上下限保留输入文本，按十进制比较。例如 `94.999999999999999` 小于 `95`；恰好等于上下限仍算范围内。JSON 中这些数值是字符串。直接查询 SQLite 前，调用 `decimal_values.configure(connection)`，不要转成 REAL 再比较。旧数据库已丢失的小数位无法恢复，请用原 CSV 重新分析。

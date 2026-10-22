@@ -1,0 +1,12 @@
+{
+  "version": "0.8.0-alpha.1",
+  "checked_on": "2026-10-22",
+  "source_tests": 129,
+  "source_self_test": "passed",
+  "built_exe_self_test": "passed",
+  "extracted_unicode_path_self_test": "passed",
+  "archive_crc": "passed",
+  "archive_sha256": "cef683a2c3aa16eecc496799b90449e4f62a037ea6627864dea907e784d2156d",
+  "exe_sha256": "0f963973f2568c59bf4cfee1574688e93f9367ec6d3c1889d37e724c170e7101",
+  "scope": "Synthetic automated checks on Windows/Python 3.14; not human QC validation."
+}

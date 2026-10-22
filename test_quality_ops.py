@@ -204,7 +204,7 @@ class QualityTests(unittest.TestCase):
         for group in result["reports"]["01_test_ranges"]:
             rows = group_details(result, "01_test_ranges", group)
             self.assertEqual(len(rows), group["measured_records"])
-        wide = next(g for g in result["reports"]["01_test_ranges"] if g["spec_high"] == 200)
+        wide = next(g for g in result["reports"]["01_test_ranges"] if g["spec_high"] == "200")
         self.assertEqual([r["test_id"] for r in group_details(result, "01_test_ranges", wide)], ["T8"])
         self.assertEqual(wide["outside_range_records"], 0)
 
@@ -260,7 +260,7 @@ class QualityTests(unittest.TestCase):
             detail.status_filter.current(1)
             detail.refresh()
             self.assertEqual([r["test_id"] for r in detail.visible_rows], ["T3"])
-            self.assertEqual(detail.visible_rows[0]["value"], 106)
+            self.assertEqual(detail.visible_rows[0]["value"], "106")
             detail.search.set("no-such-record")
             self.assertEqual(detail.visible_rows, [])
             self.assertIn("0 / 5", detail.counts.get())

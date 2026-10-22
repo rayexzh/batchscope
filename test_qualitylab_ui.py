@@ -59,7 +59,7 @@ class LaboratoryUiTests(unittest.TestCase):
         self.assertIn('重新运行', view.status.cget('text'))
         view.buttons['restore'].invoke()
         self.assertEqual(view.model.changes, {})
-        self.assertEqual(view.fields['value'].get(), '90.0')
+        self.assertEqual(view.fields['value'].get(), '90')
         self.assertEqual(self.app.result, before)
 
     def test_presentation_changes_preserve_unsaved_form_and_repeat_plan(self):

@@ -159,7 +159,7 @@ class InputCheckUiTests(unittest.TestCase):
         content = ''.join(widget.get('1.0', 'end') for widget in detail.winfo_children()[0].winfo_children()
                           if isinstance(widget, tk.Text))
         self.assertIn('非批准值', content)
-        self.assertIn('85.0 .. 105.0', content)
+        self.assertIn('85 .. 105', content)
         detail.destroy()
         self.app.toggle_language()
         self.view.search.set('specification')

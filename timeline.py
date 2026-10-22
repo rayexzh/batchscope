@@ -1,3 +1,4 @@
+from decimal_values import configure, dumps
 """Multi-date quality snapshots and audit-event timelines from fixed inputs."""
 from collections import Counter
 from contextlib import closing
@@ -45,7 +46,7 @@ def quality_timeline(inputs, dates, output):
     # Parent completion record only after all reports are written.
     result['artifact_sha256'] = {p.relative_to(output).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
                                   for p in sorted(output.rglob('*')) if p.is_file()}
-    (output/'manifest.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
+    (output/'manifest.json').write_text(dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
     return result
 
 
@@ -82,7 +83,7 @@ def audit_timeline(review, dates):
 
 def export_timeline(result, folder):
     folder=Path(folder);folder.mkdir(parents=True,exist_ok=False)
-    (folder/'TIMELINE.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
+    (folder/'TIMELINE.json').write_text(dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
     for key in ('rows','metrics','deviations','actions','measurements','rules','unplaced'):
         rows=result.get(key,[])
         if rows:
@@ -101,6 +102,6 @@ def export_timeline(result, folder):
         scope=result['scope'] if language=='en' else result['scope_zh']
         (folder/f'TIMELINE.{code}.html').write_text(
             f'<!doctype html><html lang="{code}"><meta charset="utf-8"><title>{title}</title><style>body{{font:16px sans-serif;margin:32px;color:#18313e}}table{{border-collapse:collapse}}td,th{{padding:8px;border:1px solid #bbc}}.scroll{{overflow:auto}}</style><h1>BatchScope · {title}</h1><p>{escape(scope)}</p><p>{escape(result["source"])}</p><p>Synthetic demonstration / 模拟演示</p>'+''.join(tables),encoding='utf-8')
-    (folder/'manifest.json').write_text(json.dumps({'complete':True,'artifacts':{
+    (folder/'manifest.json').write_text(dumps({'complete':True,'artifacts':{
         p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(folder.iterdir()) if p.is_file()}},indent=2),encoding='utf-8')
     return folder

@@ -160,7 +160,7 @@ class LaboratoryTests(unittest.TestCase):
         self.model.stage('T1', {'value': 999})
         self.model.export(result, self.root / 'old-run')
         stored = json.loads((self.root / 'old-run/EXPERIMENT.json').read_text(encoding='utf-8'))
-        self.assertEqual(stored['changes']['T1']['value'], 100)
+        self.assertEqual(stored['changes']['T1']['value'], '100')
 
     def test_tampered_result_is_rejected_before_any_export(self):
         result = self.model.run('2026-06-30')

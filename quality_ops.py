@@ -9,6 +9,8 @@ import hashlib
 import io
 import json
 import math
+from decimal import Decimal, InvalidOperation
+from decimal_values import configure, dumps, ExactDecimal
 from pathlib import Path
 import random
 import re
@@ -17,7 +19,7 @@ from runtime_paths import RESOURCE_ROOT
 from workbench import build_operations, export_operations
 
 ROOT = RESOURCE_ROOT
-VERSION = "0.7.0-alpha.4"
+VERSION = "0.8.0-alpha.1"
 COLUMNS = {
     "batches": "batch_id product manufactured_on".split(),
     "test_results": "test_id batch_id test_type method value unit spec_low spec_high spec_unit measured_on".split(),
@@ -35,13 +37,20 @@ def finite_number(value):
     """Decimal/exponent values only; never guess separators or strip units."""
     if isinstance(value, bool) or not NUMBER_RE.fullmatch(str(value).strip()):
         raise ValueError('Use a finite number without separators or unit text.')
+    if len(str(value)) > 1024:
+        raise ValueError("Numeric input is too long (maximum 1024 characters).")
     number = float(value)
     if not math.isfinite(number):
         raise ValueError('Use a finite number without separators or unit text.')
     # Inspect the decimal mantissa so even very long exponents cannot hide underflow.
     if number == 0 and any(digit in '123456789' for digit in str(value).lower().split('e', 1)[0]):
         raise ValueError('Non-zero value is too small to store; it would become zero.')
-    return number
+    try:
+        return ExactDecimal(str(value).strip())
+    except InvalidOperation:
+        if number == 0:
+            return Decimal(0)
+        raise ValueError("Unsupported decimal exponent.")
 
 
 def iso_date(value):
@@ -58,7 +67,8 @@ def write_csv(path, columns, rows):
         for row in rows:
             # CSV spreadsheets must not interpret user-supplied text as formulas.
             writer.writerow(["'" + x if isinstance(x, str) and x.lstrip().startswith(("=", "+", "-", "@"))
-                             else x for x in row])
+                             and not ((c in NUMBERS or c.endswith(("_value", "_low", "_high"))) and NUMBER_RE.fullmatch(x.strip()))
+                             else x for c, x in zip(columns, row)])
 
 
 def generate(folder, seed=42, batches=100):
@@ -93,7 +103,7 @@ def generate(folder, seed=42, batches=100):
     folder.mkdir(parents=True)
     for table, rows in data.items():
         write_csv(folder / f"{table}.csv", COLUMNS[table], rows)
-    (folder / "SOURCE.json").write_text(json.dumps({
+    (folder / "SOURCE.json").write_text(dumps({
         "data_type": "synthetic", "generator_version": VERSION, "seed": seed,
         "batches": batches, "date_origin": start.isoformat(),
         "note": "Fictional products, methods and specifications; no real patient, employee or company records."
@@ -275,7 +285,7 @@ def input_report(check):
 
 def write_input_report(check, folder):
     folder = Path(folder)
-    (folder / 'INPUT_CHECK.json').write_text(json.dumps(input_report(check), ensure_ascii=False, indent=2), encoding='utf-8')
+    (folder / 'INPUT_CHECK.json').write_text(dumps(input_report(check), ensure_ascii=False, indent=2), encoding='utf-8')
     columns = INPUT_FINDING_COLUMNS
     write_csv(folder / 'INPUT_FINDINGS.csv', columns, [[row[key] for key in columns] for row in check['findings']])
 
@@ -300,6 +310,7 @@ def analyse(inputs, output, as_of):
         raise ValueError(f"{len(issues)} input issues; inspect {output / 'INPUT_ISSUES.csv'}")
     reports, details = {}, {}
     with closing(sqlite3.connect(output / "quality.sqlite")) as db:
+        configure(db)
         db.executescript((ROOT / "schema.sql").read_text(encoding="utf-8"))
         for table, columns in COLUMNS.items():
             db.executemany(f"INSERT INTO {table} VALUES ({','.join('?' for _ in columns)})",
@@ -334,7 +345,7 @@ def analyse(inputs, output, as_of):
                "input_sha256": hashes, "metrics": metrics, "reports": reports,
                "details": details, "operations": operations}
     export_operations(output, summary)
-    (output / "RESULTS.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False, allow_nan=False), encoding="utf-8")
+    (output / "RESULTS.json").write_text(dumps(summary, indent=2, ensure_ascii=False, allow_nan=False), encoding="utf-8")
     lines = ["# BatchScope / 批次质量洞察", "", "Pharmaceutical quality operations analytics / 药企质量运营分析", "", "Synthetic demonstration / 模拟数据演示",
              f"As of / 截至：{as_of}", "", "| Metric / 指标 | Value / 数值 |", "|---|---:|"]
     labels = {"measured_records": "Measured records / 检验记录", "judgeable_records": "Judgeable / 可判定记录",
@@ -348,7 +359,7 @@ def analyse(inputs, output, as_of):
     (output / "SUMMARY.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     summary["artifact_sha256"] = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(output.iterdir()) if p.is_file()}
     # A completion manifest is written last; partial output folders are not completed runs.
-    (output / "manifest.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False, allow_nan=False), encoding="utf-8")
+    (output / "manifest.json").write_text(dumps(summary, indent=2, ensure_ascii=False, allow_nan=False), encoding="utf-8")
     return summary
 
 
@@ -368,7 +379,7 @@ def main():
         result = generate(args.folder, args.seed, args.batches) if args.command == "generate" else analyse(args.inputs, args.output, args.as_of)["metrics"]
     except (OSError, ValueError, sqlite3.Error, UnicodeError) as exc:
         parser.exit(1, f"Failed / 失败：{exc}\n")
-    print(json.dumps(result, indent=2))
+    print(dumps(result, indent=2))
 
 
 if __name__ == "__main__":

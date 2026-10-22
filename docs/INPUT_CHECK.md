@@ -13,7 +13,7 @@ The **Files** tab shows how many records could be read. **Findings** lists the f
 
 Numbers accept a decimal point, optional sign and scientific notation, such as `98.5`, `-1` or `1e2`. Commas, underscores, units, formulas and non-finite values are rejected. The app does not guess the intended value or convert units.
 
-The calculations use binary floating-point numbers. Very small non-zero values that would become zero are rejected, including in limits and laboratory forms. This guard does not provide arbitrary decimal precision.
+Results and limits are compared as exact decimals without rounding. CSV and JSON retain numeric text; SQLite uses TEXT with DECIMAL_ORDER collation. Counts and percentages remain summary measures. Numeric input is limited to 1024 characters; non-finite values and non-zero values outside the previous floating-point storage range are still rejected.
 
 The check covers the input files, including records after the chosen analysis date. Row numbers count CSV records, with the header as row 1; a malformed CSV instead reports the parser's line. If syntax or value errors prevent reliable relationships, fix them and check again to see remaining relationship checks.
 
@@ -38,7 +38,7 @@ This prototype accepts only folders marked as synthetic. Passing a check means t
 
 数值可以写成 `98.5`、`-1`、`1e2`。逗号、下划线、单位文字、公式和无穷值会被拦住，程序不会猜数值，也不换算单位。
 
-计算使用二进制浮点数。极小的非零数如果会被读成零，就会报错；范围和实验室表单也使用这一规则。这不表示程序支持任意小数精度。
+检验值和上下限按输入的十进制数比较，不先舍入。CSV 和 JSON 保留数字文本；SQLite 使用 TEXT 和 DECIMAL_ORDER 排序规则。数量与百分比仍是统计指标。数值最长 1024 个字符；超出原有有限数范围或小到会转成零的非零数仍被拦住。
 
 预检检查整个输入文件，包括分析截止日期之后的记录。行号按 CSV 记录计数，表头为第 1 行；CSV 解析失败时显示解析器的行号。若格式或数值错误影响关联检查，先修正后重查。
 

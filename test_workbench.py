@@ -88,7 +88,7 @@ class WorkbenchTests(unittest.TestCase):
         self.assertIsNone(next(r for r in batch["actions"] if r["action_id"] == "A4")["days_until_due"])
         self.fixture.data["test_results"][2][4] = 100
         self.fixture.save()
-        self.assertEqual(next(r for r in batch_snapshot(result,"B1")["measurements"] if r["test_id"] == "T3")["value"],106)
+        self.assertEqual(next(r for r in batch_snapshot(result,"B1")["measurements"] if r["test_id"] == "T3")["value"],"106")
         with self.assertRaises(ValueError):
             batch_snapshot(result,"B2")
 

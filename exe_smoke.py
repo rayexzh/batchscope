@@ -261,8 +261,23 @@ def self_test(folder):
         comparison = window.open_comparison()
         comparison.window.withdraw()
         root.update()
+        from lab_session import save_session, load_session
+        lab_model = laboratory.model
+        target_id = lab_model.tests[0]['test_id']
+        lab_model.stage(target_id, {'value': '94.999999999999999', 'spec_low': '95', 'spec_high': '105'})
+        exact_result = lab_model.run('2026-06-30')
+        transition = next(row for row in exact_result['transitions'] if row['test_id'] == target_id)
+        if transition['after_status'] != 'outside_range':
+            raise AssertionError('Decimal boundary was rounded into range.')
+        progress = folder / 'saved-progress.bslab'
+        save_session(progress, lab_model, {'as_of': '2026-06-30', 'selected_id': target_id, 'forms': {}, 'rechecks': []})
+        resumed, state = load_session(progress)
+        if str(resumed.current(target_id)['value']) != '94.999999999999999':
+            raise AssertionError('Saved progress lost decimal digits.')
+        if resumed.run(state['as_of'])['scenario_metrics'] != exact_result['scenario_metrics']:
+            raise AssertionError('Resumed scenario differs.')
         evidence = {"project":"BatchScope","version":VERSION,"status":"passed",
-                    "checks":["bundled SQL resources","June and July metrics","two-date comparison",
+                    "checks":["exact decimal boundary comparison", "portable lab progress roundtrip", "bundled SQL resources","June and July metrics","two-date comparison",
                               "work queue and backlog reconciliation","SQLite foreign keys","artifact hashes",
                               "native Generate/Analyse workflow and persistent outputs",
                               "native workbench and batch tracing","language/theme switching","comparison window",

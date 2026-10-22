@@ -4,8 +4,8 @@ CREATE TABLE batches (
 );
 CREATE TABLE test_results (
  test_id TEXT PRIMARY KEY, batch_id TEXT NOT NULL REFERENCES batches(batch_id),
- test_type TEXT NOT NULL, method TEXT NOT NULL, value REAL, unit TEXT NOT NULL,
- spec_low REAL NOT NULL, spec_high REAL NOT NULL, spec_unit TEXT NOT NULL,
+ test_type TEXT NOT NULL, method TEXT NOT NULL, value TEXT COLLATE DECIMAL_ORDER, unit TEXT NOT NULL,
+ spec_low TEXT COLLATE DECIMAL_ORDER NOT NULL, spec_high TEXT COLLATE DECIMAL_ORDER NOT NULL, spec_unit TEXT NOT NULL,
  measured_on TEXT NOT NULL, CHECK(spec_low <= spec_high)
 );
 CREATE TABLE deviations (

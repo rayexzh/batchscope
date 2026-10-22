@@ -1,3 +1,4 @@
+from decimal_values import configure, dumps
 """BatchScope: compare two as-of dates using one validated input snapshot."""
 import argparse
 from contextlib import closing
@@ -10,6 +11,7 @@ from quality_ops import ROOT, VERSION, analyse, iso_date, write_csv
 
 
 def snapshot(db, as_of):
+    configure(db)
     reports, details = {}, {}
     for directory, target in (("sql", reports), ("detail_sql", details)):
         for query in sorted((ROOT / directory).glob("*.sql")):
@@ -89,8 +91,8 @@ def compare(inputs, output, from_date, to_date):
         before = snapshot(db, from_date)
         comparison = build_comparison(db, before, after)
     comparison.update(project="BatchScope", version=VERSION, data_type="synthetic-demo-only", input_sha256=after["input_sha256"])
-    (output / "START_SNAPSHOT.json").write_text(json.dumps(before, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
-    (output / "COMPARISON.json").write_text(json.dumps(comparison, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
+    (output / "START_SNAPSHOT.json").write_text(dumps(before, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
+    (output / "COMPARISON.json").write_text(dumps(comparison, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
     schemas = {"metrics": ["metric", "before_value", "after_value", "delta"],
                "deviations": ["deviation_id", "batch_id", "product", "category", "opened_on", "closed_on_source", "before_status", "after_status", "change"],
                "actions": ["action_id", "deviation_id", "batch_id", "product", "category", "owner_role", "created_on", "due_on", "completed_on_source", "before_status", "after_status", "change", "before_overdue_days", "after_overdue_days"],
@@ -113,7 +115,7 @@ def compare(inputs, output, from_date, to_date):
     (output / "COMPARISON.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     comparison["artifact_sha256"] = {p.relative_to(output).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
                                      for p in sorted(output.rglob("*")) if p.is_file()}
-    (output / "manifest.json").write_text(json.dumps(comparison, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
+    (output / "manifest.json").write_text(dumps(comparison, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
     # Main view stays an end-date snapshot; the comparison window owns separate data.
     return {**after, "comparison": comparison}
 
@@ -129,4 +131,4 @@ if __name__ == "__main__":
         result = compare(args.inputs, args.output, args.from_date, args.to_date)
     except (OSError, ValueError, sqlite3.Error, UnicodeError) as exc:
         parser.exit(1, f"Failed / 失败：{exc}\n")
-    print(json.dumps(result["comparison"]["metrics"], indent=2))
+    print(dumps(result["comparison"]["metrics"], indent=2))

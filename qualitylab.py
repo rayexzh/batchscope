@@ -1,3 +1,4 @@
+from decimal_values import configure, dumps
 """Isolated what-if experiments on a completed synthetic quality snapshot."""
 from contextlib import closing
 from copy import deepcopy
@@ -38,6 +39,11 @@ class Laboratory:
                 self._data = {table: [dict(zip(columns, row)) for row in db.execute(
                     'SELECT ' + ','.join(columns) + ' FROM ' + table + ' ORDER BY ' + columns[0])]
                     for table, columns in COLUMNS.items()}
+        for row in self._data['test_results']:
+            for field in ('value', 'spec_low', 'spec_high'):
+                if row[field] is not None:
+                    row[field] = finite_number(row[field])
+        self._snapshot_bytes = content
         self._tests = {row['test_id']: row for row in self._data['test_results']}
         self._made = {row['batch_id']: row['manufactured_on'] for row in self._data['batches']}
         self._products = {row['batch_id']: row['product'] for row in self._data['batches']}
@@ -95,6 +101,7 @@ class Laboratory:
         iso_date(as_of)
         changes = deepcopy(self.changes)
         with closing(sqlite3.connect(':memory:')) as db:
+            configure(db)
             db.executescript((ROOT / 'schema.sql').read_text(encoding='utf-8'))
             for table, columns in COLUMNS.items():
                 db.executemany('INSERT INTO ' + table + ' VALUES (' + ','.join('?' for _ in columns) + ')',
@@ -185,7 +192,7 @@ class Laboratory:
                 raise ValueError('Recheck exercise differs from its recorded plan. / 重复检验练习与所记录计划不符。')
         destination = Path(destination)
         destination.mkdir(parents=True, exist_ok=False)
-        (destination / 'EXPERIMENT.json').write_text(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False), encoding='utf-8')
+        (destination / 'EXPERIMENT.json').write_text(dumps(result, ensure_ascii=False, indent=2, allow_nan=False), encoding='utf-8')
         for name in ('metrics', 'transitions'):
             rows = result[name]
             columns = list(rows[0]) if rows else ['test_id', 'before_status', 'after_status']
@@ -201,7 +208,7 @@ class Laboratory:
                 if arm == 'scenario' and table == 'test_results':
                     rows = [{**row, **result['changes'].get(row['test_id'], {})} for row in rows]
                 write_csv(folder / (table + '.csv'), columns, [[row[c] for c in columns] for row in rows])
-            (folder / 'SOURCE.json').write_text(json.dumps({
+            (folder / 'SOURCE.json').write_text(dumps({
                 'data_type': 'synthetic', 'origin': 'BatchScope quality laboratory', 'arm': arm,
                 'baseline_database_sha256': self.source_sha256, 'note': SCOPE}, indent=2), encoding='utf-8')
         for language, scope in (('en', SCOPE), ('zh-CN', SCOPE_ZH)):
@@ -217,15 +224,15 @@ class Laboratory:
                 columns = list(rows[0])
                 body += '<div class="scroll"><table><tr>' + ''.join('<th>' + html.escape(field_label(c, lang)) + '</th>' for c in columns) + '</tr>'
                 body += ''.join('<tr>' + ''.join('<td>' + html.escape(display_value(c, row[c], lang)) + '</td>' for c in columns) + '</tr>' for row in rows) + '</table></div>'
-            body += '<h2>' + ('实际修改字段' if lang == 'zh' else 'Recorded field changes') + '</h2><pre>' + html.escape(json.dumps(result['changes'], ensure_ascii=False, indent=2)) + '</pre></html>'
+            body += '<h2>' + ('实际修改字段' if lang == 'zh' else 'Recorded field changes') + '</h2><pre>' + html.escape(dumps(result['changes'], ensure_ascii=False, indent=2)) + '</pre></html>'
             if result.get('rechecks'):
                 title = '重复检验练习：保留每次结果，不作放行判断' if lang == 'zh' else 'Recheck exercise: all attempts retained; no release verdict'
-                detail = html.escape(json.dumps(result['rechecks'], ensure_ascii=False, indent=2))
+                detail = html.escape(dumps(result['rechecks'], ensure_ascii=False, indent=2))
                 body = body.replace('</html>', '<h2>' + title + '</h2><pre>' + detail + '</pre></html>')
             (destination / ('LAB.' + language + '.html')).write_text(body, encoding='utf-8')
         artifacts = {p.relative_to(destination).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
                      for p in sorted(destination.rglob('*')) if p.is_file()}
-        (destination / 'manifest.json').write_text(json.dumps({
+        (destination / 'manifest.json').write_text(dumps({
             'complete': True, 'kind': result['kind'], 'source_sha256': self.source_sha256,
             'as_of': result['as_of'], 'artifacts': artifacts}, indent=2), encoding='utf-8')
         return destination

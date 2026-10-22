@@ -12,6 +12,9 @@ from qualitylab import EDITABLE, Laboratory
 from quality_ops import finite_number
 
 TEXT = {
+    'save_work': ('保存进度', 'Save progress'),
+    'load_work': ('打开进度', 'Open progress'),
+    'saved_work': ('进度已保存：{folder}', 'Progress saved: {folder}'),
     'scope': ('模拟实验，不改原始数据；假设范围不代表获批规格，不用于批次放行。', 'Synthetic experiments; source data stays unchanged. Hypothetical limits are not approved specifications or release criteria.'),
     'title': ('质量数据实验室', 'Quality data laboratory'),
     'edit': ('1. 选择并修改模拟记录', '1. Edit a synthetic record'),
@@ -51,9 +54,9 @@ TEXT = {
 
 
 class LaboratoryWindow:
-    def __init__(self, owner, factory, database, as_of, expected_sha256):
+    def __init__(self, owner, factory, database, as_of, expected_sha256, model=None):
         self.owner, self.factory = owner, factory
-        self.model = Laboratory(database, as_of, expected_sha256)
+        self.model = model if model is not None else Laboratory(database, as_of, expected_sha256)
         self.originals = {row['test_id']: row for row in self.model.tests}
         self.result, self.output, self.exported_state = None, None, None
         self.rechecks, self.events = [], queue.Queue()
@@ -90,7 +93,7 @@ class LaboratoryWindow:
         action_row = ttk.Frame(controls)
         action_row.pack(fill='x', pady=4)
         self.action_row = action_row
-        for key, command in [('run', self.run), ('export', self.export), ('open', self.open_report)]:
+        for key, command in [('run', self.run), ('export', self.export), ('open', self.open_report), ('save_work', self.save_work), ('load_work', self.load_work)]:
             button = ttk.Button(action_row, command=command)
             button.grid(row=0, column=len(self.buttons), sticky='w', padx=(0, 6), pady=2)
             self.buttons[key] = button
@@ -200,6 +203,47 @@ class LaboratoryWindow:
             self.test_table.tree.selection_set(items[0])
             self.select()
 
+    def save_work(self):
+        if self.busy:
+            return
+        from lab_session import save_session
+        path = filedialog.asksaveasfilename(parent=self.window, defaultextension='.bslab',
+            filetypes=[('BatchScope progress', '*.bslab')])
+        if not path:
+            return
+        self.cache_form()
+        try:
+            save_session(path, self.model, {'as_of': self.as_of.get().strip(),
+                'selected_id': self.selected_id, 'forms': self.record_forms, 'rechecks': self.rechecks})
+            self.status.configure(text=self.text('saved_work', folder=path))
+        except (OSError, ValueError) as exc:
+            messagebox.showerror(self.text('failure'), str(exc), parent=self.window)
+
+    def load_work(self):
+        if not self.busy:
+            self.owner.open_lab_progress()
+
+    def restore_progress(self, state):
+        # History is recomputed from the saved plans, not deserialized numeric summaries.
+        self.rechecks = [self.model.recheck(e['test_id'], e['planned_rounds'], e['reason']) for e in state['rechecks']]
+        self.evaluated_plans = {}
+        for exercise in self.rechecks:
+            fields = exercise['planned_rounds']
+            reference = self.default_plan(exercise['test_id'])
+            reference.update(rounds=str(len(fields)+1), reason=exercise['reason'])
+            reference['fields'][:len(fields)] = fields
+            self.evaluated_plans[exercise['test_id']] = reference
+        self.record_forms = deepcopy(state['forms'])
+        self.as_of.set(state['as_of'])
+        selected = state['selected_id']
+        for item in self.test_table.tree.get_children():
+            self.test_table.tree.selection_set(item)
+            row = self.test_table.selected()
+            if row and row['test_id'] == selected:
+                break
+        self.select(force=True)
+        self.render_status()
+
     def text(self, key, **values):
         return TEXT[key][1 if self.owner.language == 'en' else 0].format(**values)
 
@@ -291,7 +335,7 @@ class LaboratoryWindow:
     def layout_actions(self, event=None):
         width = event.width if event is not None else self.action_row.winfo_width()
         row, column, used = 0, 0, 0
-        for key in ('run', 'export', 'open'):
+        for key in ('run', 'export', 'open', 'save_work', 'load_work'):
             button = self.buttons[key]
             needed = button.winfo_reqwidth() + 6
             if used and used + needed > width:

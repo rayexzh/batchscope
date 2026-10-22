@@ -8,6 +8,8 @@ View sample batch test results, open deviations and overdue actions.
 - Compare dates and trace records to their batch.
 - Change sample data and practise two- or three-attempt tests.
 - Review audit logs, search records and export reports.
+- Save lab progress and reopen it later, including unfinished drafts.
+- Compare decimal results with limits without rounding first.
 
 Runs locally in English or Chinese. Uses fictional data; not for real batch release.
 

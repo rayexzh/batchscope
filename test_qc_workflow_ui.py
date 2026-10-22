@@ -75,7 +75,7 @@ class QcWorkflowTests(unittest.TestCase):
         self.assertFalse(view.pending()[0])
         view.run();self.wait()
         self.assertEqual(view.result['scenario_metrics']['outside_range_records'], 0)
-        self.assertEqual(self.export()['changes']['T1']['value'], 101.25)
+        self.assertEqual(self.export()['changes']['T1']['value'], '101.25')
 
     def test_edited_repeat_cannot_export_old_values_and_new_evaluation_retains_history(self):
         view = self.view
@@ -94,11 +94,11 @@ class QcWorkflowTests(unittest.TestCase):
             asked.assert_called_once()
         view.buttons['evaluate'].invoke();self.wait()
         second = self.export()
-        self.assertEqual(first['rechecks'][0]['attempts'][1]['value'], 100)
-        self.assertEqual(second['rechecks'][0]['attempts'][1]['value'], 100)
-        self.assertEqual(second['rechecks'][1]['attempts'][1]['value'], 101)
+        self.assertEqual(first['rechecks'][0]['attempts'][1]['value'], '100')
+        self.assertEqual(second['rechecks'][0]['attempts'][1]['value'], '100')
+        self.assertEqual(second['rechecks'][1]['attempts'][1]['value'], '101')
         self.assertEqual(second['rechecks'][1]['reason'], 'Updated reason')
-        self.assertEqual(second['rechecks'][1]['attempts'][0]['value'], 90)
+        self.assertEqual(second['rechecks'][1]['attempts'][0]['value'], '90')
         self.assertTrue(view.confirm_close())
 
     def test_all_repeat_fields_reason_and_round_count_mark_pending(self):

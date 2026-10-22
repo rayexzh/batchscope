@@ -1,5 +1,6 @@
 """Desktop review with language, theme, readable tables and record actions."""
 from collections import Counter
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 import os
 import queue
@@ -90,8 +91,19 @@ class RecordTable:
         present = [i for i, row in enumerate(self.rows) if row[column] is not None]
         missing = [i for i, row in enumerate(self.rows) if row[column] is None]
         # Each schema column has one type; numeric values sort numerically, NULL stays last.
-        present.sort(key=lambda i: self.rows[i][column].casefold() if isinstance(self.rows[i][column], str)
-                     else self.rows[i][column], reverse=descending)
+        def ordering(index):
+            value = self.rows[index][column]
+            if column in ('value', 'spec_low', 'spec_high', 'baseline_value', 'scenario_value',
+                          'baseline_low', 'scenario_low', 'baseline_high', 'scenario_high'):
+                try:
+                    number = Decimal(str(value))
+                    if number.is_finite():
+                        return (0, number)
+                except InvalidOperation:
+                    pass
+                return (1, str(value).casefold())
+            return value.casefold() if isinstance(value, str) else value
+        present.sort(key=ordering, reverse=descending)
         for position, index in enumerate(present + missing):
             self.tree.move(str(index), "", position)
             self.tree.item(str(index), tags=("even" if position % 2 == 0 else "odd",))
@@ -356,6 +368,8 @@ class Window:
         self.timeline_button.pack(side="left", padx=8)
         self.lab_button = ttk.Button(extra_toolbar, command=self.open_laboratory, state='disabled')
         self.lab_button.pack(side='left')
+        self.lab_progress_button = ttk.Button(extra_toolbar, command=self.open_lab_progress)
+        self.lab_progress_button.pack(side='left', padx=8)
         self.language_button = ttk.Button(toolbar, command=self.toggle_language)
         self.language_button.pack(side="right")
         self.theme_button = ttk.Button(toolbar, command=self.toggle_theme)
@@ -463,6 +477,7 @@ class Window:
         self.audit_button.configure(text="审计日志复核" if self.language == "zh" else "Audit log review")
         self.timeline_button.configure(text="多日期对比" if self.language == "zh" else "Multi-date review")
         self.lab_button.configure(text=self.t('laboratory'))
+        self.lab_progress_button.configure(text='Open lab progress' if self.language == 'en' else '打开实验室进度')
         self.inputcheck_button.configure(text=self.t('input_check'))
         self.language_button.configure(text="English" if self.language == "zh" else "中文")
         self.theme_button.configure(text=self.t("dark" if self.theme == "light" else "light"))
@@ -715,6 +730,22 @@ class Window:
         view = WorkbenchWindow(self, self.result, RecordTable)
         self.review_views.append(view)
         return view
+
+    def open_lab_progress(self):
+        if self.busy:
+            return
+        from lab_session import load_session
+        path = filedialog.askopenfilename(parent=self.root, filetypes=[('BatchScope progress', '*.bslab')])
+        if not path:
+            return
+        try:
+            model, state = load_session(path)
+            view = LaboratoryWindow(self, RecordTable, None, model.as_of, model.source_sha256, model=model)
+            view.restore_progress(state)
+            self.review_views.append(view)
+            return view
+        except (OSError, ValueError, sqlite3.Error) as exc:
+            messagebox.showerror(self.t('laboratory'), str(exc), parent=self.root)
 
     def open_laboratory(self):
         if self.busy or self.phase != 'completed' or not self.result or not self.output:

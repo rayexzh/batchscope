@@ -1,5 +1,12 @@
 # Change log / 更新日志
 
+## 0.8.0-alpha.1 — 2026-10-22
+
+- Compare test results and limits as decimals; preserve input digits in exports. JSON numeric measurements and SQLite fields now use text.
+- Save and reopen lab progress, including unfinished forms and repeat plans. Recalculate before exporting a restored experiment.
+- 检验值和上下限改用十进制比较，导出保留原小数。JSON 和 SQLite 中的检验数值改为文本。
+- 实验室可保存并恢复草稿、排队修改和复检计划；恢复后重新计算再导出。
+
 ## v0.7.0-alpha.4 (2026-10-16) — Keep drafts / 保留草稿
 
 - Keep main and repeat forms per record within the open laboratory. Pending forms are checked before export and close. / 实验室窗口内按记录保留主表单和复检草稿，导出和关闭时检查未处理内容。
