@@ -62,6 +62,7 @@ class LaboratoryWindow:
         self.rechecks, self.events = [], queue.Queue()
         self.busy, self.poll_id, self.selected_id = False, None, None
         self.record_forms, self.evaluated_plans = {}, {}
+        self.saved_progress = None
         self.loading_forms = True
         self.window = tk.Toplevel(owner.root)
         self.window.transient(owner.root)
@@ -203,6 +204,20 @@ class LaboratoryWindow:
             self.test_table.tree.selection_set(items[0])
             self.select()
 
+    def progress_state(self):
+        self.cache_form()
+        return {'as_of': self.as_of.get().strip(), 'selected_id': self.selected_id,
+                'forms': self.record_forms, 'rechecks': self.rechecks, 'evaluated_plans': self.evaluated_plans}
+
+    def progress_signature(self):
+        from decimal_values import dumps
+        state = self.progress_state()
+        main, repeated = self.pending()
+        drafts = {key: {part: form[part] for part, ids in [('main', main), ('repeat', repeated)] if key in ids}
+                  for key, form in state['forms'].items() if key in main or key in repeated}
+        return dumps({'changes': self.model.changes, 'as_of': state['as_of'],
+                      'drafts': drafts, 'rechecks': self.rechecks}, sort_keys=True)
+
     def save_work(self):
         if self.busy:
             return
@@ -213,8 +228,8 @@ class LaboratoryWindow:
             return
         self.cache_form()
         try:
-            save_session(path, self.model, {'as_of': self.as_of.get().strip(),
-                'selected_id': self.selected_id, 'forms': self.record_forms, 'rechecks': self.rechecks})
+            save_session(path, self.model, self.progress_state())
+            self.saved_progress = self.progress_signature()
             self.status.configure(text=self.text('saved_work', folder=path))
         except (OSError, ValueError) as exc:
             messagebox.showerror(self.text('failure'), str(exc), parent=self.window)
@@ -232,7 +247,12 @@ class LaboratoryWindow:
             reference = self.default_plan(exercise['test_id'])
             reference.update(rounds=str(len(fields)+1), reason=exercise['reason'])
             reference['fields'][:len(fields)] = fields
+            from lab_session import matches_exercise
+            cached = state['forms'].get(exercise['test_id'], {}).get('repeat')
+            if cached is not None and matches_exercise(cached, exercise):
+                reference = deepcopy(cached)
             self.evaluated_plans[exercise['test_id']] = reference
+        self.evaluated_plans.update(deepcopy(state.get('evaluated_plans', {})))
         self.record_forms = deepcopy(state['forms'])
         self.as_of.set(state['as_of'])
         selected = state['selected_id']
@@ -243,6 +263,7 @@ class LaboratoryWindow:
                 break
         self.select(force=True)
         self.render_status()
+        self.saved_progress = self.progress_signature()
 
     def text(self, key, **values):
         return TEXT[key][1 if self.owner.language == 'en' else 0].format(**values)
@@ -546,6 +567,10 @@ class LaboratoryWindow:
         if self.busy:
             messagebox.showinfo(self.text('title'), self.text('wait'), parent=self.window)
             return False
+        if self.saved_progress is not None:
+            if self.saved_progress == self.progress_signature() or (not any(self.pending()) and self.exported_state == self.state()):
+                return True
+            return messagebox.askyesno(self.text('title'), self.text('discard'), parent=self.window)
         if any(self.pending()) or (self.model.changes or self.rechecks) and self.exported_state != self.state():
             return messagebox.askyesno(self.text('title'), self.text('discard'), parent=self.window)
         return True

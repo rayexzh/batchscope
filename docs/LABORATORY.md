@@ -61,9 +61,9 @@ Use the as-of date stored in `EXPERIMENT.json` and new output folders. **Reset e
 
 ## Save progress / 保存进度
 
-Click **Save progress** to save a new `.bslab` file. It includes the baseline snapshot, staged changes, unfinished forms and evaluated attempts. On the main window, **Open lab progress** reopens it without the original output folder. Run comparison again before exporting. Existing progress files are not overwritten; choose a new name.
+Click **Save progress** to save a new `.bslab` file. It includes the baseline snapshot, staged changes, unfinished forms and evaluated attempts. On the main window, **Open lab progress** reopens it without the original output folder. Run comparison again before exporting. Existing progress files are not overwritten; choose a new name. After saving, you can close without a discard warning; new edits trigger it again. Two-attempt plans keep their evaluated state when reopened.
 
-点「保存进度」保存为新的 `.bslab` 文件，包含基准数据、排队修改、未完成表单和已评价轮次。下次在主窗口点「打开实验室进度」，不需要原输出文件夹。恢复后重新运行对比，再导出结果。已有进度文件不会覆盖，请另取名字。
+点「保存进度」保存为新的 `.bslab` 文件，包含基准数据、排队修改、未完成表单和已评价轮次。下次在主窗口点「打开实验室进度」，不需要原输出文件夹。恢复后重新运行对比，再导出结果。已有进度文件不会覆盖，请另取名字。保存后关闭不再误报丢弃修改；继续编辑后会重新提醒。两轮复检恢复后保留已评价状态。
 
 Progress is an editable working file, not an approved record or completed report. The snapshot checksum detects changed bytes; it does not authenticate the author.
 

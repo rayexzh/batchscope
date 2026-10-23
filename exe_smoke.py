@@ -276,8 +276,15 @@ def self_test(folder):
             raise AssertionError('Saved progress lost decimal digits.')
         if resumed.run(state['as_of'])['scenario_metrics'] != exact_result['scenario_metrics']:
             raise AssertionError('Resumed scenario differs.')
+        saved_signature = laboratory.progress_signature()
+        laboratory.saved_progress = saved_signature
+        if not laboratory.confirm_close():
+            raise AssertionError('Saved progress still prompts on close.')
+        laboratory.fields['value'].set('unfinished after saving')
+        if laboratory.progress_signature() == saved_signature:
+            raise AssertionError('New edits were not detected after saving.')
         evidence = {"project":"BatchScope","version":VERSION,"status":"passed",
-                    "checks":["exact decimal boundary comparison", "portable lab progress roundtrip", "bundled SQL resources","June and July metrics","two-date comparison",
+                    "checks":["saved progress close guard and new edit detection", "exact decimal boundary comparison", "portable lab progress roundtrip", "bundled SQL resources","June and July metrics","two-date comparison",
                               "work queue and backlog reconciliation","SQLite foreign keys","artifact hashes",
                               "native Generate/Analyse workflow and persistent outputs",
                               "native workbench and batch tracing","language/theme switching","comparison window",

@@ -1,0 +1,22 @@
+{
+  "version": "0.8.0-alpha.2",
+  "checked_on": "2026-10-23",
+  "source_tests": 135,
+  "source_self_test": "passed",
+  "built_exe_self_test": "passed",
+  "extracted_unicode_path_self_test": "passed",
+  "archive_crc": "passed",
+  "archive_sha256": "605f09b964ec0cb68a4e4f0b23c3c0107c291580204b21291a678c19afdbc68d",
+  "exe_sha256": "541b2e951518556e863cbe397910e0c09e7fd076566b942c79d0762a37596d94",
+  "new_checks": [
+    "save then close without false discard prompt",
+    "new edits after saving still prompt",
+    "two-attempt evaluated plan survives reopen",
+    "previous alpha progress compatibility",
+    "interrupted save publishes no partial file",
+    "existing copy is not overwritten",
+    "invalid drafts rejected before writing",
+    "duplicate JSON and altered evaluated plan rejected"
+  ],
+  "scope": "Synthetic automated checks on Windows/Python 3.14; not human QC validation."
+}

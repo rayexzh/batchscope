@@ -1,5 +1,14 @@
 # Change log / 更新日志
 
+## 0.8.0-alpha.2 — 2026-10-23
+
+- Saved progress closes without a discard warning. New edits still prompt before closing.
+- Reopening two-attempt plans preserves their evaluated state, including older alpha progress files.
+- Interrupted saves leave no partial progress file; existing copies stay unchanged. Invalid fields are checked before saving.
+- 保存后关闭不再误报丢弃修改；继续编辑后仍会提醒。
+- 两轮复检恢复后保留已评价状态，兼容上一版进度文件。
+- 保存中断不留下半成品；不覆盖旧文件，写入前检查进度字段。
+
 ## 0.8.0-alpha.1 — 2026-10-22
 
 - Compare test results and limits as decimals; preserve input digits in exports. JSON numeric measurements and SQLite fields now use text.
